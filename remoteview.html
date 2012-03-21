@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://ogp.me/ns/fb#">
+  <head>
+    <meta charset="utf-8">
+    <title><%= @app.name %></title>
+<style type="text/css">
+ul.navlist {
+list-style: none;
+display: block;
+padding: 0;
+margin-left: 0.5em;
+margin-right: 0.5em;
+}
+
+ul.navlist li a, ul.navlist li b {
+	display: block;
+	width: 7em;
+	font: 12px Verdana, Arial, Helvetica, sans-serif;
+	font-weight: normal;
+	text-decoration: none;
+	text-align: center;
+	color: #ffffff;
+	background-color: #0000ff;
+	padding-top: 0.2em;
+	padding-right: 1em;
+	padding-bottom: 0.2em;
+	padding-left: 1em;
+	border: 0.2em solid;
+	border-color: #3366FF #000066 #000066 #3366FF;
+}
+
+ul.navlist li a:hover, ul.navlist li b {
+	text-decoration: none;
+	color: #FFFF00;
+	background-color: #0000cc;
+	padding-top: 0.3em;
+	padding-right: 0.9em;
+	padding-bottom: 0.1em;
+	padding-left: 1.1em;
+	border: 0.2em solid;
+	border-color: #000066 #3366FF #3366FF #000066;
+}
+
+ul.navlist li a:active, ul.navlist li b {
+	color: #FF9900;
+}
+/* End Menu */
+</style>
+</head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+<script>
+function reloadContent() {
+
+$.get('http://gkovacs.xvm.mit.edu/transgame/content.html', function(data) {
+  $('#fb-root').html(data);
+});
+
+//$('#fb-root').load('content.html');
+}
+
+$(document).ready(function(){
+/*
+var oRequest = new XMLHttpRequest();
+var sURL  = 'content.html';
+oRequest.open("GET",sURL,false);
+oRequest.setRequestHeader("User-Agent",navigator.userAgent);
+oRequest.send(null);
+if (oRequest.status==200) {
+alert(oRequest.responseText);
+}
+*/
+
+//reloadContent();
+//setTimeout(reloadContent, 1000);
+setInterval(reloadContent, 500);
+
+});
+</script>
+<body>
+<div id="fb-root">
+</div>
+</body>
+</html>

@@ -1,0 +1,2 @@
+Mainichi Newspaper|trung,gk
+END

@@ -1,0 +1,6 @@
+It's a type of tea or milk.|gk
+it is a type of soy tea with milk|lucy
+It's a type of soy tea with milk.|latif
+不早了，该走了|anthony
+晚安|jiunnwen
+END

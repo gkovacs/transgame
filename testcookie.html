@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://ogp.me/ns/fb#">
+  <head>
+    <meta charset="utf-8">
+    <title><%= @app.name %></title>
+<style type="text/css">
+</style>
+  </head>
+  <body>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+<script src="jquery.cookie.js"></script>
+<script>
+
+$(document).ready(function(){
+
+userid = $.cookie('transgame_userid');
+
+if (userid == null) {
+  userid = Math.floor(Math.random()*10000001);
+  $.cookie('transgame_userid', userid, { expires: 7, path: '/' });
+}
+$('#fb-root').html(userid);
+
+//$('#fb-root').html('foobar')
+
+});
+
+</script>
+<div id="fb-root">
+</div>
+  </body>
+</html>
