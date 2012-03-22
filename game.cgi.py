@@ -336,12 +336,12 @@ if (userid == null) {
 }
 
 textBeingTranslated = '';
-dontRefreshTextBeingTranslated = false;
+//dontRefreshTextBeingTranslated = false;
 prevVotingRegionHTML = '';
 
 function submitNewTranslation() {
 
-//if (textBeingTranslated != $('#text_being_translated').val()) {
+//if (textBeingTranslated != $('#text_being_translated').html()) {
 //submitNewTextBeingTranslated();
 //}
 
@@ -354,15 +354,13 @@ return false;
 }
 
 function submitNewTextBeingTranslated() {
-dontRefreshTextBeingTranslated = true;
 clearVoting();
 //console.log('submitting new text to be translated');
-var text = $('#text_being_translated').val();
+var text = $('#text_to_be_translated_suggestion').val();
 textBeingTranslated = text;
 //console.log(textBeingTranslated);
 sendNewTextBeingTranslated(text);
 clearVoting();
-dontRefreshTextBeingTranslated = false;
 return false;
 }
 
@@ -405,10 +403,7 @@ $('#timeDisplay').html(data);
 
 }
 
-function reloadContent() {
-
-if (dontRefreshTextBeingTranslated)
-  return;
+function reloadTextBeingTranslated() {
 
 // reload the thing displaying what's being translated right now
 $.get('http://gkovacs.xvm.mit.edu/transgame/gamedata/''' + gameid + '''.current', function(data) {
@@ -418,13 +413,20 @@ if (lines[lines.length - 1] != 'END' && lines[lines.length - 2] != 'END')
 var newText = unescape(lines[0]);
 if (newText == textBeingTranslated)
   return;
-if (dontRefreshTextBeingTranslated)
-  return;
+//if (dontRefreshTextBeingTranslated)
+//  return;
 textBeingTranslated = newText;
 //textBeingTranslated = decode64(textBeingTranslated);
-$('#text_being_translated').val(textBeingTranslated);
+$('#text_being_translated').html(textBeingTranslated);
 clearVoting();
 });
+
+}
+
+function reloadContent() {
+
+//if (dontRefreshTextBeingTranslated)
+//  return;
 
 // reload the translations
 //$.get('http://gkovacs.xvm.mit.edu/transgame/gamedata/''' + gameid + '''.html', function(data) {
@@ -434,8 +436,8 @@ $.get('http://gkovacs.xvm.mit.edu/transgame/gamedata/''' + gameid + '''_' + enco
   var lines = data.split('\\n');
   if (lines[lines.length - 1] != 'END' && lines[lines.length - 2] != 'END')
     return;
-  if (dontRefreshTextBeingTranslated)
-    return;
+  //if (dontRefreshTextBeingTranslated)
+  //  return;
   var htmlpage = '<div id="navcontainer"><ul class="navlist">';
   var byVotes = []
   for (var i = 0; i < lines.length - 1; ++i) {
@@ -524,6 +526,7 @@ $('#scoreBoardRegionContents').pad({'padId':'transgams-''' + gameidAlphaNumeric 
 
 //setTimeout(reloadContent, 1000);
 setInterval(reloadContent, 500);
+setInterval(reloadTextBeingTranslated, 500);
 setInterval(reloadTime, 500);
 
 
@@ -623,14 +626,13 @@ collapseOrExpand($('#scoreBoardRegion'));
 
 <div class="drsElement" id="translateRegion" style="background: #b0c4de; background-color: #b0c4de;">
  <div class="drsMoveHandle" id="translateRegionBar">Translate</div>
-<!--<div class="bottomC">-->
 <div id="translateRegionContents">
 <form action="" onsubmit='return submitNewTextBeingTranslated()'>
-Translate: <input type='text' name='text_being_translated' id='text_being_translated' style='width: 70%;'></input>
+Text Being Translated: <div name='text_being_translated' id='text_being_translated'></div>
+Suggest Text to be Translated: <input type='text' name='text_to_be_translated_suggestion' id='text_to_be_translated_suggestion' style='width: 70%;'></input>
 </form>
 
 <form action="" onsubmit='return submitNewTranslation()'>
-<!--<input type='text' id='add_translation' style='width: 70%;'></input>-->
 Translation: <input type='text' name='add_translation' id='add_translation' style='width: 70%;'></input>
 </form>
 <div id="voting-region" style='width: 70%'></div>
