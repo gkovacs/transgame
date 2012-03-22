@@ -417,6 +417,9 @@ prevVotingRegionHTML = '';
 function reloadTime() {
 $.get('http://gkovacs.xvm.mit.edu/transgame/timeleft.cgi.py?gameid=''' + gameid + '''', function(data) {
 console.log(data);
+timeleft = parseInt(data)
+timeleft += Math.round(0.1*textBeingTranslated.length);
+data = timeleft.toString();
 $('#timeDisplay').html(data);
 });
 

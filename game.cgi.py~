@@ -415,8 +415,11 @@ prevVotingRegionHTML = '';
 }
 
 function reloadTime() {
-$.get('http://gkovacs.xvm.mit.edu/transgame/timeleft.cgi.py?gameid=''' + gameid + '''&text=' + encode64(textBeingTranslated), function(data) {
+$.get('http://gkovacs.xvm.mit.edu/transgame/timeleft.cgi.py?gameid=''' + gameid + '''', function(data) {
 console.log(data);
+timeleft = parseInt(data)
+timeleft += 0.1*textBeingTranslated.length;
+data = timeleft.toString();
 $('#timeDisplay').html(data);
 });
 
