@@ -415,7 +415,7 @@ prevVotingRegionHTML = '';
 }
 
 function reloadTime() {
-$.get('http://gkovacs.xvm.mit.edu/transgame/timeleft.cgi.py?gameid=''' + gameid + '''&text=' + textBeingTranslated, function(data) {
+$.get('http://gkovacs.xvm.mit.edu/transgame/timeleft.cgi.py?gameid=''' + gameid + '''&text=' + encode64(textBeingTranslated), function(data) {
 console.log(data);
 $('#timeDisplay').html(data);
 });
