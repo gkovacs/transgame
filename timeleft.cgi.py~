@@ -25,7 +25,7 @@ except:
 
 textlengthbonus = int(len(text) * 0.1)
 
-timeleft = starttime + 60 + textlengthbonus - unixtime
+timeleft = starttime + 60 - unixtime
 if timeleft < 0:
   timeleft = 0
 print timeleft

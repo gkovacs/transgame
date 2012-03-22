@@ -9,12 +9,15 @@ import time
 
 gameid = param('gameid')
 
+unixtime = int(time.time())
+
+print unixtime
+
 open('gamedata/' + gameid + '.starttime', 'a+')
 
 with FileLock('gamedata/' + gameid + '.starttime') as lock:
   f = open('gamedata/' + gameid + '.starttime', 'r+')
   f.seek(0)
-  unixtime = int(time.time())
   f.write(str(unixtime))
   f.truncate()
   f.close()
