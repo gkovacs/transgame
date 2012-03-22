@@ -1,3 +1,0 @@
-from Beijing.|jiunnwen
-She was born in Beijing.|Yinong,gk,luo
-END
