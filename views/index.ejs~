@@ -285,6 +285,7 @@ margin:auto;"
 <script src="http://gkovacs.xvm.mit.edu/transgame/base64.js"></script>
 <script src="http://gkovacs.xvm.mit.edu/transgame/md5.js"></script>
 <script src="http://gkovacs.xvm.mit.edu/transgame/dragresize.js"></script>
+<script src="http://gkovacs.xvm.mit.edu:8080/nowjs/now.js"></script>
 <script>
 
 userid = $.cookie('transgame_userid');
@@ -295,8 +296,21 @@ if (userid == null) {
   //$.cookie('transgame_userid', userid, { expires: 7, path: '/' });
 }
 
+now.updateTime = function(time){
+  $("#timeDisplay").html(time);
+}
+
 textBeingTranslated = '';
 prevVotingRegionHTML = '';
+
+now.setTextToBeTranslated = function(text) {
+  if (text == $('#text_to_be_translated_suggestion').val()) {
+    now.suggestNewTextToBeTranslated('', userid);
+    $('#text_to_be_translated_suggestion').val('');
+  }
+  textBeingTranslated = text;
+  $('#text_being_translated').html(textBeingTranslated);
+}
 
 function submitNewTranslation() {
 
@@ -316,9 +330,8 @@ function submitNewTextBeingTranslated() {
 clearVoting();
 //console.log('submitting new text to be translated');
 var text = $('#text_to_be_translated_suggestion').val();
-textBeingTranslated = text;
-//console.log(textBeingTranslated);
-sendNewTextBeingTranslated(text);
+
+now.suggestNewTextToBeTranslated(text, userid);
 clearVoting();
 return false;
 }
@@ -370,6 +383,7 @@ $('#voting-region').html('');
 prevVotingRegionHTML = '';
 }
 
+/*
 function reloadTime() {
 $.get('http://gkovacs.xvm.mit.edu/transgame/timeleft.cgi.py?gameid=<%= gameidsubs %>', function(data) {
 console.log(data);
@@ -380,7 +394,9 @@ $('#timeDisplay').html(data);
 });
 
 }
+*/
 
+/*
 function reloadTextBeingTranslated() {
 
 // reload the thing displaying what's being translated right now
@@ -397,6 +413,7 @@ clearVoting();
 });
 
 }
+*/
 
 function reloadContent() {
 
@@ -428,12 +445,12 @@ $.get('http://gkovacs.xvm.mit.edu/transgame/gamedata/<%= gameidsubs %>_' + hex_m
     }
     var numNoVotes = 5 - numVotes;
     for (var j = 0; j < numNoVotes; ++j) {
-      curhtml += '<img src="novote.png" />';
+      curhtml += '<img src="http://gkovacs.xvm.mit.edu/transgame/novote.png" />';
     }
     var contributingUser = votingUsers[0];
     for (var j = 0; j < numVotes; ++j) {
       var votingUserName = votingUsers[j];
-      curhtml += '<img src="plusvote.png" title="' + votingUserName + '" alt="' + votingUserName + '" />';
+      curhtml += '<img src="http://gkovacs.xvm.mit.edu/transgame/plusvote.png" title="' + votingUserName + '" alt="' + votingUserName + '" />';
     }
     
     
@@ -477,6 +494,13 @@ function collapseOrExpand(elem) {
   }
 }
 
+now.ready(function() {
+  now.sendTextBeingTranslatedToCallback(function(text) {
+    textBeingTranslated = text;
+    $('#text_being_translated').html(textBeingTranslated);
+  });
+})
+
 $(document).ready(function(){
 /*
 var oRequest = new XMLHttpRequest();
@@ -496,10 +520,10 @@ $('#scoreBoardRegionContents').pad({'padId':'transgams-<%= gameidalphanumericsub
 
 //setTimeout(reloadContent, 1000);
 setInterval(reloadContent, 500);
-setInterval(reloadTextBeingTranslated, 500);
+//setInterval(reloadTextBeingTranslated, 500);
 //setInterval(reloadTime, 500);
 
-
+displayTextBeingTranslated();
 
 docWidth = $(document).width();
 docHeight = $(document).height();

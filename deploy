@@ -1,3 +1,3 @@
 #/bin/sh
 
-rsync -avP --exclude .git -e ssh . gkovacs@gkovacs.xvm.mit.edu:/home/gkovacs/www/transgame
+rsync -avP --exclude .git --exclude node_modules -e ssh . gkovacs@gkovacs.xvm.mit.edu:/home/gkovacs/www/transgame

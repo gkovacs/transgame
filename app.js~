@@ -10,6 +10,8 @@ var app = module.exports = express.createServer();
 
 var crypto = require('crypto');
 
+var nowjs = require("now");
+
 // Configuration
 
 app.configure(function(){
@@ -37,11 +39,48 @@ app.configure('production', function(){
 app.get('/', function(req, res){
   url = req.query['url']
   gameidsubs = new Buffer(url, 'binary').toString('base64').replace('+', '-').replace('_', '/');
-  gameidalphanumericsubs = crypto.createHash('md5').update(gameidsubs).digest("hex").slice(0,50);
+  gameidalphanumericsubs = crypto.createHash('md5').update(url).digest("hex").slice(0,50);
   res.render('index', { title: 'Ninja Store' });
   //res.send('id: ' + req.query["id"]);
 });
 
 app.listen(8080);
+
+var everyone = nowjs.initialize(app);
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
 
+userToSuggestedText = {}
+textBeingTranslated = ''
+
+everyone.now.suggestNewTextToBeTranslated = function(text, userid) {
+  if (text == '') {
+    delete userToSuggestedText[userid];
+  } else {
+    userToSuggestedText[userid] = text;
+  }
+}
+
+everyone.now.getTextBeingTranslated = function(callback) {
+  callback(textBeingTranslated);
+}
+
+var gameDuration = 20;
+var curtime = gameDuration + 1;
+
+setInterval(function() {
+//var curtime = Math.round((new Date()).getTime() / 1000);
+if (curtime == 0) {
+  var users = Object.keys(userToSuggestedText);
+  if (users.length == 0)
+    return;
+  var selectedUserIdx = [Math.floor(Math.random()*users.length)];
+  var selectedUser = users[selectedUserIdx];
+  textBeingTranslated = userToSuggestedText[selectedUser];
+  everyone.now.setTextToBeTranslated(textBeingTranslated);
+  curtime = gameDuration;
+  
+} else {
+curtime -= 1;
+}
+everyone.now.updateTime(curtime);
+}, 1000);
