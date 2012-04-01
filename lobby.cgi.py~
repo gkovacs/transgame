@@ -44,7 +44,7 @@ URL to translate: <input type="text" name="urlToTranslate" />
 <input type="submit" value="Start New Translation Game" /><br/>
 '''
 for x in availableGames:
-  print '<a href="http://gkovacs.xvm.mit.edu:8080/?url=' + x + '">' + x + '</a><br/>'
+  print '<a href="http://gkovacs.xvm.mit.edu:3000/?url=' + x + '">' + x + '</a><br/>'
 '''
 </body>
 </html>
