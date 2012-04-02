@@ -110,7 +110,7 @@ userList = []
 function updateScores() {
   $.each(translationToUserList, function(translation,voters) {
     if (voters.length < 1)
-      continue
+      return
     for (var userid in voters) {
       if (userScores[userid] == null)
         userScores[userid] = 0

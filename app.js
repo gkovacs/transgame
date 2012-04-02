@@ -125,7 +125,7 @@ function updateScores() {
   everyone.now.sendNewScores(userScores, userList)
 }
 
-var gameDuration = 20;
+var gameDuration = 30;
 var curtime = 0 //gameDuration + 1;
 
 nowjs.on("connect", function(){

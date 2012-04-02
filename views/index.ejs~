@@ -692,12 +692,6 @@ Translation: <input type='text' name='add_translation' id='add_translation' styl
  <div class="drsMoveHandle" id="timeRegionBar">Time</div>
  <div id="timeRegionContents">
 <div id="timeDisplay" style="font-size: 26px; text-align: center;" >0</div>
-<form action="" onsubmit='return submitStartTimer()'>
-<input type="submit" name="mysubmit" value="Start Round" />
-</form>
-<form action="" onsubmit='return submitSwitchRound()'>
-<input type="submit" name="mysubmit" value="Switch Round" />
-</form>
 </div>
 </div>
 
