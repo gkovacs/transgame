@@ -296,8 +296,20 @@ if (userid == null) {
   //$.cookie('transgame_userid', userid, { expires: 7, path: '/' });
 }
 
+now.userid = userid
+
 now.updateTime = function(time){
   $("#timeDisplay").html(time);
+}
+
+now.sendNewScores = function(userScores, userList) {
+  var curhtml = ''
+  for (var i = 0; i < userList.length; ++i) {
+    var curUser = userList[i]
+    var score = userScores[curUser]
+    curhtml += curUser + ': ' + score + '<br/>'
+  }
+  $('#scoreBoardRegionContents').html(curhtml)
 }
 
 textBeingTranslated = '';
@@ -335,7 +347,7 @@ function submitNewTextBeingTranslated() {
 var text = $('#text_to_be_translated_suggestion').val();
 
 now.suggestNewTextToBeTranslated(text, userid);
-clearVoting();
+//clearVoting();
 return false;
 }
 
@@ -550,7 +562,8 @@ alert(oRequest.responseText);
 
 //$('#userid_display').html(userid);
 $('#chatRegionContents').pad({'padId':'transgame-<%= gameidalphanumericsubs %>', 'height': '100%', 'userName': userid, 'showChat': true});
-$('#scoreBoardRegionContents').pad({'padId':'transgams-<%= gameidalphanumericsubs %>', 'height': '100%', 'userName': userid});
+
+//$('#scoreBoardRegionContents').pad({'padId':'transgams-<%= gameidalphanumericsubs %>', 'height': '100%', 'userName': userid});
 
 //setTimeout(reloadContent, 1000);
 //setInterval(reloadContent, 500);

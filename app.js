@@ -66,7 +66,7 @@ everyone.now.suggestNewTextToBeTranslated = function(text, userid) {
   }
 }
 
-function removeElement(arrayName,arrayElement) {
+function removeElement(arrayElement, arrayName) {
   arrayName.splice($.inArray(arrayElement, arrayName), 1)
 }
 
@@ -81,7 +81,7 @@ everyone.now.submitTranslation = function(text, userid) {
     return
   }
   if (prevTranslation != null) {
-    removeElement(translationToUserList[prevTranslation], userid)
+    removeElement(userid, translationToUserList[prevTranslation])
   }
   if (text == '') {
     
@@ -104,8 +104,45 @@ everyone.now.sendTextBeingTranslatedToCallback = function(callback) {
   callback(textBeingTranslated);
 }
 
+userScores = {}
+userList = []
+
+function updateScores() {
+  $.each(translationToUserList, function(translation,voters) {
+    if (voters.length < 1)
+      return
+    for (var userid in voters) {
+      if (userScores[userid] == null)
+        userScores[userid] = 0
+    }
+    var contributer = voters[0]
+    userScores[contributer] += voters.length - 1
+    for (var i = 1; i < voters.length; ++i) {
+      var voter = voters[i]
+      userScores[voter] += 1
+    }
+  })
+  everyone.now.sendNewScores(userScores, userList)
+}
+
 var gameDuration = 20;
 var curtime = 0 //gameDuration + 1;
+
+nowjs.on("connect", function(){
+  var userid = this.now.userid
+  userScores[userid] = 0
+  userList.push(userid)
+  everyone.now.sendNewScores(userScores, userList)
+  console.log('connected ' + userid)
+});
+
+nowjs.on("disconnect", function(){
+  var userid = this.now.userid
+  removeElement(userid, userList)
+  //userScores[userid] = 0
+  everyone.now.sendNewScores(userScores, userList)
+  console.log('disconnected ' + userid)
+});
 
 function newRound(textBeingTranslated) {
   everyone.now.setTextToBeTranslated(textBeingTranslated);
@@ -131,6 +168,8 @@ if (curtime == 0) {
     return;
   // store translated stuff for persistence
   client.set(textBeingTranslated, JSON.stringify({'translationToUserList': translationToUserList, 'translationsByOrderSubmitted': translationsByOrderSubmitted, 'userToTranslation': userToTranslation}))
+  
+  updateScores()
   
   var selectedUserIdx = [Math.floor(Math.random()*users.length)];
   var selectedUser = users[selectedUserIdx];
