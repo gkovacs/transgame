@@ -330,12 +330,12 @@ return false;
 }
 
 function submitNewTextBeingTranslated() {
-clearVoting();
+//clearVoting();
 //console.log('submitting new text to be translated');
 var text = $('#text_to_be_translated_suggestion').val();
 
 now.suggestNewTextToBeTranslated(text, userid);
-clearVoting();
+//clearVoting();
 return false;
 }
 

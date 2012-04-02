@@ -310,6 +310,7 @@ now.setTextToBeTranslated = function(text) {
   }
   textBeingTranslated = text;
   $('#text_being_translated').html(textBeingTranslated);
+  clearVoting();
 }
 
 function submitNewTranslation() {
@@ -329,7 +330,7 @@ return false;
 }
 
 function submitNewTextBeingTranslated() {
-clearVoting();
+//clearVoting();
 //console.log('submitting new text to be translated');
 var text = $('#text_to_be_translated_suggestion').val();
 

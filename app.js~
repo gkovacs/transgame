@@ -14,6 +14,10 @@ var nowjs = require("now");
 
 var $ = require('jQuery');
 
+var redis = require('redis')
+
+var client = redis.createClient()
+
 // Configuration
 
 app.configure(function(){
@@ -63,7 +67,7 @@ everyone.now.suggestNewTextToBeTranslated = function(text, userid) {
 }
 
 function removeElement(arrayName,arrayElement) {
-  arrayName.splice($.inArray(arrayElement, y), 1)
+  arrayName.splice($.inArray(arrayElement, arrayName), 1)
 }
 
 translationsByOrderSubmitted = []
@@ -71,8 +75,13 @@ userToTranslation = {}
 translationToUserList = {}
 
 everyone.now.submitTranslation = function(text, userid) {
-  if (userToTranslation[userid] != null) {
-    prevTranslation = userToTranslation[userid]
+  var prevTranslation = userToTranslation[userid]
+  if (prevTranslation == text) {
+    // no change in translation
+    return
+  }
+  if (prevTranslation != null) {
+    
     removeElement(translationToUserList[prevTranslation], userid)
   }
   if (text == '') {
@@ -99,16 +108,36 @@ everyone.now.sendTextBeingTranslatedToCallback = function(callback) {
 var gameDuration = 20;
 var curtime = 0 //gameDuration + 1;
 
+function newRound(textBeingTranslated) {
+  everyone.now.setTextToBeTranslated(textBeingTranslated);
+  translationsByOrderSubmitted = []
+  userToTranslation = {}
+  translationToUserList = {}
+  client.get(textBeingTranslated, function(err,res) {
+    if (res != null) {
+      var pd = JSON.parse(res)
+      userToTranslation = pd.userToTranslation
+      translationToUserList = pd.translationToUserList
+      translationsByOrderSubmitted = pd.translationsByOrderSubmitted
+      everyone.now.sendUserTranslations(translationToUserList, translationsByOrderSubmitted)
+    }
+  });
+}
+
 setInterval(function() {
 //var curtime = Math.round((new Date()).getTime() / 1000);
 if (curtime == 0) {
   var users = Object.keys(userToSuggestedText);
   if (users.length == 0)
     return;
+  // store translated stuff for persistence
+  client.set(textBeingTranslated, JSON.stringify({'translationToUserList': translationToUserList, 'translationsByOrderSubmitted': translationsByOrderSubmitted, 'userToTranslation': userToTranslation}))
+  
   var selectedUserIdx = [Math.floor(Math.random()*users.length)];
   var selectedUser = users[selectedUserIdx];
   textBeingTranslated = userToSuggestedText[selectedUser];
-  everyone.now.setTextToBeTranslated(textBeingTranslated);
+  newRound(textBeingTranslated);
+  
   curtime = gameDuration;
   
 } else {
