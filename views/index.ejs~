@@ -321,7 +321,9 @@ function submitNewTranslation() {
 //console.log('submitting translation');
 translation = $('#add_translation').val();
 //console.log(translation);
+
 sendTranslation(translation);
+
 $('#add_translation').val('')
 return false;
 }
@@ -351,24 +353,11 @@ return false;
 }
 
 function sendTranslation(translation) {
-$.get('http://gkovacs.xvm.mit.edu/transgame/translate.cgi.py?gameid=<%= gameidsubs %>&userid=' + userid + '&text=' + encode64(textBeingTranslated) + '&translation=' + translation, function(data) {
-console.log(data);
-});
+now.submitTranslation(translation, userid)
+//$.get('http://gkovacs.xvm.mit.edu/transgame/translate.cgi.py?gameid=<%= gameidsubs %>&userid=' + userid + '&text=' + encode64(textBeingTranslated) + '&translation=' + translation, function(data) {
+//console.log(data);
+//});
 }
-
-function sendNewTextBeingTranslated(text) {
-$.get('http://gkovacs.xvm.mit.edu/transgame/suggesttext.cgi.py?gameid=<%= gameidsubs %>&userid=' + userid + '&text=' + encode64(text), function(data) {
-console.log(data);
-});
-}
-
-/*
-function sendNewTextBeingTranslated(text) {
-$.get('http://gkovacs.xvm.mit.edu/transgame/textbeingtranslated.cgi.py?gameid=<%= gameidsubs %>&text=' + encode64(text), function(data) {
-
-});
-}
-*/
 
 function rpartition(s, sep) {
 l = s.split(sep);
@@ -415,6 +404,50 @@ clearVoting();
 }
 */
 
+now.sendUserTranslations = function(translationToUserList, translationsByOrderSubmitted) {
+  var htmlpage = '<div id="navcontainer"><ul class="navlist">';
+  var byVotes = []
+  for (var i = 0; i < translationsByOrderSubmitted.length; ++i) {
+    var translation = translationsByOrderSubmitted[i]
+    var votingUsers = translationToUserList[translation]
+    if (votingUsers == null)
+      continue
+    var contributingUser = votingUsers[0]
+    if (contributingUser == null)
+      continue
+    
+    var spanClass = '';
+    if ($.inArray(userid, votingUsers) != -1) {
+      spanClass = 'class="selectedTrans"';
+    }
+    var curhtml = '<li onclick="sendTranslation(\'' + translation + '\')" ' + spanClass + ' >';
+    var numVotes = votingUsers.length;
+    if (numVotes > 5) {
+      numVotes = 5;
+    }
+    var numNoVotes = 5 - numVotes;
+    for (var j = 0; j < numNoVotes; ++j) {
+      curhtml += '<img src="http://gkovacs.xvm.mit.edu/transgame/novote.png" />';
+    }
+    for (var j = 0; j < numVotes; ++j) {
+      var votingUserName = votingUsers[j];
+      curhtml += '<img src="http://gkovacs.xvm.mit.edu/transgame/plusvote.png" title="' + votingUserName + '" alt="' + votingUserName + '" />';
+    }
+    
+    
+    curhtml += translation + ' (<i>' + contributingUser + '</i>)</li>';
+    byVotes[byVotes.length] = [votingUsers.length, curhtml];
+  }
+  for (var i = 0; i < byVotes.length; ++i) {
+    htmlpage += byVotes[i][1];
+  }
+  htmlpage += '</ul></div>';
+  if (htmlpage != prevVotingRegionHTML) {
+    prevVotingRegionHTML = htmlpage;
+    $('#voting-region').html(htmlpage);
+  }
+}
+
 function reloadContent() {
 
 // reload the translations
@@ -438,7 +471,7 @@ $.get('http://gkovacs.xvm.mit.edu/transgame/gamedata/<%= gameidsubs %>_' + hex_m
     if ($.inArray(userid, votingUsers) != -1) {
       spanClass = 'class="selectedTrans"';
     }
-    var curhtml = '<li onclick="sendTranslation(\'' + escape(translation) + '\')" ' + spanClass + ' >';
+    var curhtml = '<li onclick="sendTranslation(\'' + translation + '\')" ' + spanClass + ' >';
     var numVotes = votingUsers.length;
     if (numVotes > 5) {
       numVotes = 5;
@@ -519,11 +552,9 @@ $('#chatRegionContents').pad({'padId':'transgame-<%= gameidalphanumericsubs %>',
 $('#scoreBoardRegionContents').pad({'padId':'transgams-<%= gameidalphanumericsubs %>', 'height': '100%', 'userName': userid});
 
 //setTimeout(reloadContent, 1000);
-setInterval(reloadContent, 500);
+//setInterval(reloadContent, 500);
 //setInterval(reloadTextBeingTranslated, 500);
 //setInterval(reloadTime, 500);
-
-displayTextBeingTranslated();
 
 docWidth = $(document).width();
 docHeight = $(document).height();

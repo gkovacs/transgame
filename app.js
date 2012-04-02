@@ -12,6 +12,8 @@ var crypto = require('crypto');
 
 var nowjs = require("now");
 
+var $ = require('jQuery');
+
 // Configuration
 
 app.configure(function(){
@@ -60,12 +62,42 @@ everyone.now.suggestNewTextToBeTranslated = function(text, userid) {
   }
 }
 
+function removeElement(arrayName,arrayElement) {
+  arrayName.splice($.inArray(arrayName, arrayElement), 1)
+}
+
+translationsByOrderSubmitted = []
+userToTranslation = {}
+translationToUserList = {}
+
+everyone.now.submitTranslation = function(text, userid) {
+  if (userToTranslation[userid] != null) {
+    prevTranslation = userToTranslation[userid]
+    removeElement(translationToUserList[prevTranslation], userid)
+  }
+  if (text == '') {
+    
+  } else {
+    if ($.inArray(text, translationsByOrderSubmitted) == -1) {
+      translationsByOrderSubmitted.push(text)
+    }
+    userToTranslation[userid] = text;
+    if (translationToUserList[text] == null) {
+      translationToUserList[text] = []
+    }
+    translationToUserList[text].push(userid)
+  }
+  console.log(translationsByOrderSubmitted)
+  console.log(translationToUserList)
+  everyone.now.sendUserTranslations(translationToUserList, translationsByOrderSubmitted)
+}
+
 everyone.now.sendTextBeingTranslatedToCallback = function(callback) {
   callback(textBeingTranslated);
 }
 
 var gameDuration = 20;
-var curtime = gameDuration + 1;
+var curtime = 0 //gameDuration + 1;
 
 setInterval(function() {
 //var curtime = Math.round((new Date()).getTime() / 1000);
