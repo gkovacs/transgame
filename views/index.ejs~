@@ -3,6 +3,9 @@
   <head>
     <meta charset="utf-8">
     <title>TransGame</title>
+<!--<style type="text/css" src='http://gkovacs.xvm.mit.edu/transgame/jquery-ui.css'></style>-->
+<!--<style type="text/css" src='http://gkovacs.xvm.mit.edu/transgame/ui.notify.css'></style>-->
+<link rel="stylesheet" type="text/css" href="http://gkovacs.xvm.mit.edu/transgame/css/jquery.gritter.css" />
 <style type="text/css">
 
 /* Apply the element you want to drag/resize */
@@ -281,6 +284,9 @@ margin:auto;"
 </head>
 <script src="http://gkovacs.xvm.mit.edu/transgame/jquery.min.js"></script>
 <script src="http://gkovacs.xvm.mit.edu/transgame/jquery.cookie.js"></script>
+<!--<script src="http://gkovacs.xvm.mit.edu/transgame/jquery-ui.min.js"></script>-->
+<script src="http://gkovacs.xvm.mit.edu/transgame/jquery.gritter.min.js"></script>
+<!--<script src="http://gkovacs.xvm.mit.edu/transgame/jquery.notify.js"></script>-->
 <script src="http://gkovacs.xvm.mit.edu/transgame/etherpad.js"></script>
 <script src="http://gkovacs.xvm.mit.edu/transgame/base64.js"></script>
 <script src="http://gkovacs.xvm.mit.edu/transgame/md5.js"></script>
@@ -297,6 +303,7 @@ if (userid == null) {
 }
 
 now.userid = userid
+now.gameid = '<%= url %>'
 
 now.updateTime = function(time){
   $("#timeDisplay").html(time);
@@ -315,21 +322,29 @@ now.sendNewScores = function(userScores, userList) {
 textBeingTranslated = '';
 prevVotingRegionHTML = '';
 
-now.setTextToBeTranslated = function(text) {
+now.setTextToBeTranslated = function(text, userSuggestingText) {
+  $.gritter.removeAll()
   if (text == $('#text_to_be_translated_suggestion').val()) {
     now.suggestNewTextToBeTranslated('', userid);
     $('#text_to_be_translated_suggestion').val('');
   }
-  textBeingTranslated = text;
-  $('#text_being_translated').html(textBeingTranslated);
+  setTextBeingTranslated(text, userSuggestingText)
   clearVoting();
 }
 
-function submitNewTranslation() {
+now.askForTextSuggestions = function() {
+if ($('.gritter-item').length == 0) {
+$.gritter.add({
+	// (string | mandatory) the heading of the notification
+	title: 'Select text for translation',
+	// (string | mandatory) the text inside the notification
+	text: 'Paste some text from the article into "Suggest Text to be Translated"',
+	sticky: true,
+});
+}
+}
 
-//if (textBeingTranslated != $('#text_being_translated').html()) {
-//submitNewTextBeingTranslated();
-//}
+function submitNewTranslation() {
 
 //console.log('submitting translation');
 translation = $('#add_translation').val();
@@ -398,25 +413,6 @@ $('#timeDisplay').html(data);
 }
 */
 
-/*
-function reloadTextBeingTranslated() {
-
-// reload the thing displaying what's being translated right now
-$.get('http://gkovacs.xvm.mit.edu/transgame/gamedata/<%= gameidsubs %>.current', function(data) {
-var lines = data.split('\n');
-if (lines[lines.length - 1] != 'END' && lines[lines.length - 2] != 'END')
-  return;
-newText = lines[0];
-if (newText == textBeingTranslated)
-  return;
-textBeingTranslated = newText;
-$('#text_being_translated').html(textBeingTranslated);
-clearVoting();
-});
-
-}
-*/
-
 now.sendUserTranslations = function(translationToUserList, translationsByOrderSubmitted) {
   var htmlpage = '<div id="navcontainer"><ul class="navlist">';
   var byVotes = []
@@ -461,64 +457,6 @@ now.sendUserTranslations = function(translationToUserList, translationsByOrderSu
   }
 }
 
-function reloadContent() {
-
-// reload the translations
-//$.get('http://gkovacs.xvm.mit.edu/transgame/gamedata/<%= gameidsubs %>.html', function(data) {
-//  $('#voting-region').html(data);
-//});
-$.get('http://gkovacs.xvm.mit.edu/transgame/gamedata/<%= gameidsubs %>_' + hex_md5(encode64(textBeingTranslated)) + '.txt', function(data) {
-  var lines = data.split('\n');
-  if (lines[lines.length - 1] != 'END' && lines[lines.length - 2] != 'END')
-    return;
-  var htmlpage = '<div id="navcontainer"><ul class="navlist">';
-  var byVotes = []
-  for (var i = 0; i < lines.length - 1; ++i) {
-    var curline = lines[i];
-    var p = rpartition(curline, '|')
-    var translation = p[0];
-    if (translation.length == 0)
-      continue;
-    var votingUsers = p[1].split(',');
-    var spanClass = '';
-    if ($.inArray(userid, votingUsers) != -1) {
-      spanClass = 'class="selectedTrans"';
-    }
-    var curhtml = '<li onclick="sendTranslation(\'' + translation + '\')" ' + spanClass + ' >';
-    var numVotes = votingUsers.length;
-    if (numVotes > 5) {
-      numVotes = 5;
-    }
-    var numNoVotes = 5 - numVotes;
-    for (var j = 0; j < numNoVotes; ++j) {
-      curhtml += '<img src="http://gkovacs.xvm.mit.edu/transgame/novote.png" />';
-    }
-    var contributingUser = votingUsers[0];
-    for (var j = 0; j < numVotes; ++j) {
-      var votingUserName = votingUsers[j];
-      curhtml += '<img src="http://gkovacs.xvm.mit.edu/transgame/plusvote.png" title="' + votingUserName + '" alt="' + votingUserName + '" />';
-    }
-    
-    
-    curhtml += translation + ' (<i>' + contributingUser + '</i>)</li>';
-    byVotes[byVotes.length] = [votingUsers.length, curhtml];
-  }
-  //byVotes.sort()
-  //byVotes.reverse()
-  for (var i = 0; i < byVotes.length; ++i) {
-    htmlpage += byVotes[i][1];
-  }
-  htmlpage += '</ul></div>';
-  if (htmlpage != prevVotingRegionHTML) {
-    prevVotingRegionHTML = htmlpage;
-    $('#voting-region').html(htmlpage);
-  }
-});
-
-
-//$('#voting-region').load('content.html');
-}
-
 function showOrHide(elem) {
   if ((elem).css("display") == "none") {
     elem.show();
@@ -540,11 +478,17 @@ function collapseOrExpand(elem) {
   }
 }
 
+function setTextBeingTranslated(text, userSuggestingText) {
+  textBeingTranslated = text;
+  if (text == '') {
+    $('#text_being_translated').html('')
+  } else {
+    $('#text_being_translated').html('<b>' + textBeingTranslated + '</b>' + ' <i>(suggested by ' + userSuggestingText + ')</i>');
+  }
+}
+
 now.ready(function() {
-  now.sendTextBeingTranslatedToCallback(function(text) {
-    textBeingTranslated = text;
-    $('#text_being_translated').html(textBeingTranslated);
-  });
+  now.sendTextBeingTranslatedToCallback(setTextBeingTranslated)
 })
 
 $(document).ready(function(){
@@ -564,12 +508,6 @@ alert(oRequest.responseText);
 $('#chatRegionContents').pad({'padId':'transgame-<%= gameidalphanumericsubs %>', 'height': '100%', 'userName': userid, 'showChat': true});
 
 //$('#scoreBoardRegionContents').pad({'padId':'transgams-<%= gameidalphanumericsubs %>', 'height': '100%', 'userName': userid});
-
-//setTimeout(reloadContent, 1000);
-//setInterval(reloadContent, 500);
-//setInterval(reloadTextBeingTranslated, 500);
-//setInterval(reloadTime, 500);
-
 docWidth = $(document).width();
 docHeight = $(document).height();
 
@@ -587,7 +525,7 @@ $('#scoreBoardRegion').height(docHeight/2);
 $('#scoreBoardRegion').offset({left:20, top:docHeight/4});
 
 $('#timeRegion').width(100);
-$('#timeRegion').height(80);
+$('#timeRegion').height(50);
 $('#timeRegion').offset({left: 0, top: 0});
 
 // Using DragResize is simple!
@@ -657,6 +595,8 @@ collapseOrExpand($('#scoreBoardRegion'));
 
 //console.log("''' + gameid + '''");
 
+//$("#notificationContainer").notify();
+
 });
 </script>
 <body>
@@ -667,9 +607,10 @@ collapseOrExpand($('#scoreBoardRegion'));
  <div class="drsMoveHandle" id="translateRegionBar">Translate</div>
 <div id="translateRegionContents">
 <form action="" onsubmit='return submitNewTextBeingTranslated()'>
-Text Being Translated: <div name='text_being_translated' id='text_being_translated'></div>
 Suggest Text to be Translated: <input type='text' name='text_to_be_translated_suggestion' id='text_to_be_translated_suggestion' style='width: 70%;'></input>
 </form>
+
+Text Being Translated: <div name='text_being_translated' id='text_being_translated'></div>
 
 <form action="" onsubmit='return submitNewTranslation()'>
 Translation: <input type='text' name='add_translation' id='add_translation' style='width: 70%;'></input>
@@ -701,6 +642,7 @@ Translation: <input type='text' name='add_translation' id='add_translation' styl
 <div id="scoreBoardDisplay" ></div>
 </div>
 </div>
+
 
 </body>
 </html>

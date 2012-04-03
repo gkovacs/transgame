@@ -46,7 +46,12 @@ app.get('/', function(req, res){
   url = req.query['url']
   gameidsubs = new Buffer(url, 'binary').toString('base64').replace('+', '-').replace('_', '/');
   gameidalphanumericsubs = crypto.createHash('md5').update(url).digest("hex").slice(0,50);
-  res.render('index', { title: 'Ninja Store' });
+  res.render('index', { title: 'TransGame' });
+  //res.send('id: ' + req.query["id"]);
+});
+
+app.get('/lobby', function(req, res){
+  res.render('lobby', { title: 'TransGame' });
   //res.send('id: ' + req.query["id"]);
 });
 
@@ -57,6 +62,7 @@ console.log("Express server listening on port %d in %s mode", app.address().port
 
 userToSuggestedText = {}
 textBeingTranslated = ''
+contributingUser = ''
 
 everyone.now.suggestNewTextToBeTranslated = function(text, userid) {
   if (text == '') {
@@ -100,12 +106,19 @@ everyone.now.submitTranslation = function(text, userid) {
   everyone.now.sendUserTranslations(translationToUserList, translationsByOrderSubmitted)
 }
 
+everyone.now.sendGameListCallback = function(callback) {
+  callback(gameToUsers, gameList)
+}
+
 everyone.now.sendTextBeingTranslatedToCallback = function(callback) {
-  callback(textBeingTranslated);
+  callback(textBeingTranslated, contributingUser);
 }
 
 userScores = {}
 userList = []
+
+gameList = []
+gameToUsers = {}
 
 function updateScores() {
   $.each(translationToUserList, function(translation,voters) {
@@ -116,7 +129,7 @@ function updateScores() {
         userScores[userid] = 0
     }
     var contributer = voters[0]
-    userScores[contributer] += voters.length - 1
+    userScores[contributer] += 2 * (voters.length - 1)
     for (var i = 1; i < voters.length; ++i) {
       var voter = voters[i]
       userScores[voter] += 1
@@ -125,11 +138,23 @@ function updateScores() {
   everyone.now.sendNewScores(userScores, userList)
 }
 
-var gameDuration = 20;
+var gameDuration = 30;
 var curtime = 0 //gameDuration + 1;
 
 nowjs.on("connect", function(){
   var userid = this.now.userid
+  var url = this.now.url
+  if (url != null) {
+    if ($.inArray(url, gameList) == -1) {
+      gameList.push(url)
+    }
+    if (gameToUsers[url] == null) {
+      gameToUsers[url] = []
+    }
+    gameToUsers[url].push(userid)
+    everyone.now.sendGameList(gameToUsers, gameList)
+  }
+  
   userScores[userid] = 0
   userList.push(userid)
   everyone.now.sendNewScores(userScores, userList)
@@ -138,14 +163,18 @@ nowjs.on("connect", function(){
 
 nowjs.on("disconnect", function(){
   var userid = this.now.userid
+  var url = this.now.url
+  removeElement(userid, gameToUsers[url])
+  everyone.now.sendGameList(gameToUsers, gameList)
+  
   removeElement(userid, userList)
   //userScores[userid] = 0
   everyone.now.sendNewScores(userScores, userList)
   console.log('disconnected ' + userid)
 });
 
-function newRound(textBeingTranslated) {
-  everyone.now.setTextToBeTranslated(textBeingTranslated);
+function newRound() {
+  everyone.now.setTextToBeTranslated(textBeingTranslated, contributingUser);
   translationsByOrderSubmitted = []
   userToTranslation = {}
   translationToUserList = {}
@@ -164,19 +193,21 @@ setInterval(function() {
 //var curtime = Math.round((new Date()).getTime() / 1000);
 if (curtime == 0) {
   var users = Object.keys(userToSuggestedText);
-  if (users.length == 0)
+  if (users.length == 0) {
+    everyone.now.askForTextSuggestions()
     return;
+  }
   // store translated stuff for persistence
   client.set(textBeingTranslated, JSON.stringify({'translationToUserList': translationToUserList, 'translationsByOrderSubmitted': translationsByOrderSubmitted, 'userToTranslation': userToTranslation}))
   
   updateScores()
   
   var selectedUserIdx = [Math.floor(Math.random()*users.length)];
-  var selectedUser = users[selectedUserIdx];
-  textBeingTranslated = userToSuggestedText[selectedUser];
-  newRound(textBeingTranslated);
+  contributingUser = users[selectedUserIdx];
+  textBeingTranslated = userToSuggestedText[contributingUser];
+  newRound();
   
-  curtime = gameDuration;
+  curtime = gameDuration + Math.round(textBeingTranslated.length / 2);
   
 } else {
 curtime -= 1;
