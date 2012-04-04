@@ -208,6 +208,7 @@ nowjs.on("connect", function(){
     gameToUsers[url].push(userid)
     nowjs.getGroup(url).addUser(this.user.clientId)
     this.now.groupAddingFinished()
+    nowjs.getGroup(url).now.sendUserTranslations(translationToUserList, translationsByOrderSubmitted)
     everyone.now.sendGameList(gameToUsers, gameList)
   }
   
