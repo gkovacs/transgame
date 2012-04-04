@@ -303,7 +303,7 @@ if (userid == null) {
 }
 
 now.userid = userid
-now.gameid = '<%= url %>'
+now.url = '<%= url %>'
 
 now.updateTime = function(time){
   $("#timeDisplay").html(time);
@@ -342,6 +342,27 @@ $.gritter.add({
 	sticky: true,
 });
 }
+}
+
+now.quitUser = function(quserid, gameid) {
+if (userid != quserid) {
+  return
+}
+if (gameid == '<%= url %>') {
+  return
+}
+/*
+$.gritter.add({
+	// (string | mandatory) the heading of the notification
+	title: 'Left game',
+	// (string | mandatory) the text inside the notification
+	text: "You've joined another game, and hence can't continue playing this one.",
+	sticky: true,
+});
+*/
+  $('#mainBody').html(userid + ", you've joined another game at " + gameid + ", and hence can't continue playing this one.")
+  disconnect(userid, '<%= url %>')
+  throw new Error('Abort Javascript');
 }
 
 function submitNewTranslation() {
@@ -599,7 +620,7 @@ collapseOrExpand($('#scoreBoardRegion'));
 
 });
 </script>
-<body>
+<body id='mainBody'>
 
 <iframe src="<%= url %>" class='fullscreen'>Your browser doesn't support iFrames.</iframe>
 

@@ -144,6 +144,7 @@ var curtime = 0 //gameDuration + 1;
 nowjs.on("connect", function(){
   var userid = this.now.userid
   var url = this.now.url
+  everyone.now.quitUser(userid, url)
   if (url != null) {
     if ($.inArray(url, gameList) == -1) {
       gameList.push(url)
@@ -163,9 +164,7 @@ nowjs.on("connect", function(){
   console.log('connected ' + userid)
 });
 
-nowjs.on("disconnect", function(){
-  var userid = this.now.userid
-  var url = this.now.url
+function disconnect(userid, url) {
   removeElement(userid, gameToUsers[url])
   everyone.now.sendGameList(gameToUsers, gameList)
   
@@ -173,6 +172,14 @@ nowjs.on("disconnect", function(){
   //userScores[userid] = 0
   everyone.now.sendNewScores(userScores, userList)
   console.log('disconnected ' + userid)
+}
+
+everyone.now.disconnect = disconnect
+
+nowjs.on("disconnect", function(){
+  var userid = this.now.userid
+  var url = this.now.url
+  disconnect(userid, url)
 });
 
 function newRound() {
