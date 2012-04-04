@@ -139,25 +139,53 @@ function updateScores() {
 }
 
 var gameDuration = 30;
-var curtime = 0 //gameDuration + 1;
+var useridToUser = {}
 
 function initializeNewGame(gameid) {
-  curtime[gameid] = 0
+var curtime = 0
+setInterval(function() {
+//var curtime = Math.round((new Date()).getTime() / 1000);
+if (curtime == 0) {
+  var users = Object.keys(userToSuggestedText);
+  if (users.length == 0) {
+    everyone.now.askForTextSuggestions()
+    return;
+  }
+  // store translated stuff for persistence
+  client.set(textBeingTranslated, JSON.stringify({'translationToUserList': translationToUserList, 'translationsByOrderSubmitted': translationsByOrderSubmitted, 'userToTranslation': userToTranslation}))
+  
+  updateScores()
+  
+  var selectedUserIdx = [Math.floor(Math.random()*users.length)];
+  contributingUser = users[selectedUserIdx];
+  textBeingTranslated = userToSuggestedText[contributingUser];
+  newRound();
+  
+  curtime = gameDuration + Math.round(textBeingTranslated.length / 2);
+  
+} else {
+curtime -= 1;
+}
+nowjs.getGroup(gameid).now.updateTime(curtime);
+}, 1000);
+
 }
 
 nowjs.on("connect", function(){
   var userid = this.now.userid
   var url = this.now.url
   everyone.now.quitUser(userid, url)
+  useridToUser[userid] = this
   if (url != null) {
     if ($.inArray(url, gameList) == -1) {
       gameList.push(url)
-      //initializeNewGame(url)
+      initializeNewGame(url)
     }
     if (gameToUsers[url] == null) {
       gameToUsers[url] = []
     }
     gameToUsers[url].push(userid)
+    nowjs.getGroup(url).addUser(this.user.clientID)
     everyone.now.sendGameList(gameToUsers, gameList)
   }
   
@@ -203,28 +231,4 @@ function newRound() {
   });
 }
 
-setInterval(function() {
-//var curtime = Math.round((new Date()).getTime() / 1000);
-if (curtime == 0) {
-  var users = Object.keys(userToSuggestedText);
-  if (users.length == 0) {
-    everyone.now.askForTextSuggestions()
-    return;
-  }
-  // store translated stuff for persistence
-  client.set(textBeingTranslated, JSON.stringify({'translationToUserList': translationToUserList, 'translationsByOrderSubmitted': translationsByOrderSubmitted, 'userToTranslation': userToTranslation}))
-  
-  updateScores()
-  
-  var selectedUserIdx = [Math.floor(Math.random()*users.length)];
-  contributingUser = users[selectedUserIdx];
-  textBeingTranslated = userToSuggestedText[contributingUser];
-  newRound();
-  
-  curtime = gameDuration + Math.round(textBeingTranslated.length / 2);
-  
-} else {
-curtime -= 1;
-}
-everyone.now.updateTime(curtime);
-}, 1000);
+
