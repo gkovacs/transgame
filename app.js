@@ -141,6 +141,10 @@ function updateScores() {
 var gameDuration = 30;
 var curtime = 0 //gameDuration + 1;
 
+//function initializeNewGame(gameid) {
+//  curtime[gameid] = 0
+//}
+
 nowjs.on("connect", function(){
   var userid = this.now.userid
   var url = this.now.url
@@ -148,6 +152,7 @@ nowjs.on("connect", function(){
   if (url != null) {
     if ($.inArray(url, gameList) == -1) {
       gameList.push(url)
+      //initializeNewGame(url)
     }
     if (gameToUsers[url] == null) {
       gameToUsers[url] = []

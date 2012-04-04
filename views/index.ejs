@@ -304,6 +304,7 @@ if (userid == null) {
 
 now.userid = userid
 now.url = '<%= url %>'
+gameid = '<%= url %>'
 
 now.updateTime = function(time){
   $("#timeDisplay").html(time);
@@ -344,11 +345,11 @@ $.gritter.add({
 }
 }
 
-now.quitUser = function(quserid, gameid) {
+now.quitUser = function(quserid, qgameid) {
 if (userid != quserid) {
   return
 }
-if (gameid == '<%= url %>') {
+if (qgameid == gameid) {
   return
 }
 /*
@@ -360,7 +361,7 @@ $.gritter.add({
 	sticky: true,
 });
 */
-  $('#mainBody').html(userid + ", you've joined another game at " + gameid + ", and hence can't continue playing this one.")
+  $('#mainBody').html(userid + ", you've joined another game at " + qgameid + ", and hence can't continue playing this one.")
   now.disconnect(userid, '<%= url %>')
   throw new Error('Abort Javascript');
 }
