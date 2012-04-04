@@ -509,9 +509,13 @@ function setTextBeingTranslated(text, userSuggestingText) {
   }
 }
 
-now.ready(function() {
+//now.ready(function() {
+//  now.sendTextBeingTranslatedToCallback(setTextBeingTranslated)
+//})
+
+now.groupAddingFinished = function() {
   now.sendTextBeingTranslatedToCallback(setTextBeingTranslated)
-})
+}
 
 $(document).ready(function(){
 /*

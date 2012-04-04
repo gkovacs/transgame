@@ -349,7 +349,7 @@ now.quitUser = function(quserid, qgameid) {
 if (userid != quserid) {
   return
 }
-if (qgameid == '<%= url %>') {
+if (qgameid == gameid) {
   return
 }
 /*
@@ -509,9 +509,13 @@ function setTextBeingTranslated(text, userSuggestingText) {
   }
 }
 
-now.ready(function() {
+//now.ready(function() {
+//  now.sendTextBeingTranslatedToCallback(setTextBeingTranslated)
+//})
+
+now.initialize = function() {
   now.sendTextBeingTranslatedToCallback(setTextBeingTranslated)
-})
+}
 
 $(document).ready(function(){
 /*

@@ -1,0 +1,43 @@
+div#query_input {
+    margin: 5px;
+    margin-left: 10px;
+}
+
+div#address_input {
+    width: 100%;
+    margin: 0;
+    text-align: center;
+    border-bottom: 1px solid #725554;
+    border-top: 1px solid #725554;
+    color: #000000;
+    background-color: #F2FDF3;
+    font-size: 12px;
+    font-weight: bold;
+    font-family: Bitstream Vera Sans,arial,sans-serif;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+span#task_header {
+    font-weight: bold;
+    font-size: 17px;
+}
+
+span#query {
+    font-family: Arial;
+    font-weight: bold;
+}
+
+input#submitter {
+    font-size: 16px;
+}
+
+iframe#browser_frame {
+    margin: 0px;
+    padding: 0px;
+    border: 0;
+}
+
+div.label {
+    padding: 5px;
+}
