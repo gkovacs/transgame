@@ -294,6 +294,10 @@ margin:auto;"
 <script src="http://gkovacs.xvm.mit.edu:9000/nowjs/now.js"></script>
 <script>
 
+String.prototype.replaceAll = function (replaceThis, withThis) {
+   return this.split(replaceThis).join(withThis)
+};
+
 userid = $.cookie('transgame_userid');
 if (userid == null) {
   alert('warning: no userid, going back to login page');
@@ -507,6 +511,9 @@ function setTextBeingTranslated(text, userSuggestingText) {
   } else {
     $('#text_being_translated').html('<b>' + textBeingTranslated + '</b>' + ' <i>(suggested by ' + userSuggestingText + ')</i>');
   }
+  var newText = frames['frameConts'].document.body.innerHTML.replaceAll('<!--gHighlightStart--><span style="background-color: yellow">', '').replaceAll('</span><!--gHighlightEnd-->', '')
+  newText = newText.replaceAll(text, '<!--gHighlightStart--><span style="background-color: yellow">' + text + '</span><!--gHighlightEnd-->')
+  frames['frameConts'].document.body.innerHTML = newText
 }
 
 //now.ready(function() {
@@ -627,7 +634,7 @@ collapseOrExpand($('#scoreBoardRegion'));
 </script>
 <body id='mainBody'>
 
-<iframe src="http://gkovacs.xvm.mit.edu:8080/proxy/<%= urlD %>" class='fullscreen'>Your browser doesn't support iFrames.</iframe>
+<iframe src="http://gkovacs.xvm.mit.edu:8080/proxy/<%= urlD %>" class='fullscreen' id='frameConts'>Your browser doesn't support iFrames.</iframe>
 
 <div class="drsElement" id="translateRegion" style="background: #b0c4de; background-color: #b0c4de;">
  <div class="drsMoveHandle" id="translateRegionBar">Translate</div>
