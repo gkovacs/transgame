@@ -3,12 +3,6 @@
  * Module dependencies.
  */
 
-var crypto = require('crypto');
-
-var nowjs = require("now");
-
-var $ = require('jQuery');
-
 var redis = require('redis')
 
 var client = redis.createClient()
@@ -21,6 +15,13 @@ var urlLib = require('url')
 
 var fs = require('fs')
 
+var crypto = require('crypto');
+
+var nowjs = require("now");
+
+var $ = require('jQuery');
+
+/*
 var lobbyData = ''
 var indexData = ''
 
@@ -45,7 +46,7 @@ var server = connect.createServer(function(request, response){
     } else {
       writeResponse(response, ejs.render(lobbyData))
     }
-  } else if (request.url.indexOf('/') == 0) {
+  } else if (request.url.indexOf('/?') == 0) {
     url = url_parts['url']
     gameidsubs = new Buffer(url, 'binary').toString('base64').replace('+', '-').replace('_', '/');
     gameidalphanumericsubs = crypto.createHash('md5').update(url).digest("hex").slice(0,50);
@@ -62,38 +63,38 @@ var server = connect.createServer(function(request, response){
 });
 
 server.listen(8080);
+*/
 
-/*
 var express = require('express')
   , routes = require('./routes');
 
-var app = module.exports = express.createServer();
+var server = module.exports = express.createServer();
 
 // Configuration
 
-app.configure(function(){
-  app.set('views', __dirname + '/views');
-  app.set('view engine', 'ejs');
-  app.set('view options', { layout: false });
-  app.use(express.bodyParser());
-  app.use(express.methodOverride());
-  app.use(app.router);
-  app.use(express.static(__dirname + '/public'));
+server.configure(function(){
+  server.set('views', __dirname + '/views');
+  server.set('view engine', 'ejs');
+  server.set('view options', { layout: false });
+  server.use(express.bodyParser());
+  server.use(express.methodOverride());
+  server.use(server.router);
+  server.use(express.static(__dirname + '/public'));
 });
 
-app.configure('development', function(){
-  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+server.configure('development', function(){
+  server.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
 
-app.configure('production', function(){
-  app.use(express.errorHandler());
+server.configure('production', function(){
+  server.use(express.errorHandler());
 });
 
 // Routes
 
-//app.get('/', routes.index);
+//server.get('/', routes.index);
 
-app.get('/', function(req, res){
+server.get('/', function(req, res){
   url = req.query['url']
   gameidsubs = new Buffer(url, 'binary').toString('base64').replace('+', '-').replace('_', '/');
   gameidalphanumericsubs = crypto.createHash('md5').update(url).digest("hex").slice(0,50);
@@ -101,18 +102,15 @@ app.get('/', function(req, res){
   //res.send('id: ' + req.query["id"]);
 });
 
-app.get('/lobby', function(req, res){
+server.get('/lobby', function(req, res){
   res.render('lobby', { title: 'TransGame' });
   //res.send('id: ' + req.query["id"]);
 });
 
-app.listen(8080);
-*/
-
-var everyone = nowjs.initialize(server);
-//console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
+server.listen(8080);
 
 
+everyone = nowjs.initialize(server);
 
 function removeElement(arrayElement, arrayName) {
   arrayName.splice($.inArray(arrayElement, arrayName), 1)
@@ -289,5 +287,4 @@ nowjs.on("disconnect", function(){
   var url = this.now.url
   disconnect(userid, url)
 });
-
 

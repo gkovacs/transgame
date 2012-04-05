@@ -1,3 +1,4 @@
 #/bin/sh
 
+cat app_header.js app_main.js > app.js
 rsync -avP --exclude .git --exclude node_modules --exclude gamedata -e ssh . gkovacs@gkovacs.xvm.mit.edu:/home/gkovacs/www/transgame
