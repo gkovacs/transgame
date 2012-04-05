@@ -1,0 +1,18 @@
+var redis = require('redis')
+
+var client = redis.createClient()
+
+// multi chain with an individual callback
+client.multi()
+    .scard("bigset")
+    .smembers("bigset")
+    .keys("*", function (err, replies) {
+        client.mget(replies, redis.print);
+    })
+    .dbsize()
+    .exec(function (err, replies) {
+        console.log("MULTI got " + replies.length + " replies");
+        replies.forEach(function (reply, index) {
+            console.log("Reply " + index + ": " + reply.toString());
+        });
+    });
