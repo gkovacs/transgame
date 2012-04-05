@@ -33,7 +33,7 @@ var game = gameList[i]
 var users = gameToUsers[game]
 curhtml += '<a href="http://gkovacs.xvm.mit.edu:8080/?url=' + game + '">' + game + '</a>'
 for (var j = 0; j < users.length; ++j) {
-curhtml += ' ' + ursers[j]
+curhtml += ' ' + users[j]
 }
 curhtml += '<br/>'
 

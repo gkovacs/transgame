@@ -291,7 +291,7 @@ margin:auto;"
 <script src="http://gkovacs.xvm.mit.edu/transgame/base64.js"></script>
 <script src="http://gkovacs.xvm.mit.edu/transgame/md5.js"></script>
 <script src="http://gkovacs.xvm.mit.edu/transgame/dragresize.js"></script>
-<script src="http://gkovacs.xvm.mit.edu:8080/nowjs/now.js"></script>
+<script src="http://gkovacs.xvm.mit.edu:9000/nowjs/now.js"></script>
 <script>
 
 userid = $.cookie('transgame_userid');
@@ -303,8 +303,8 @@ if (userid == null) {
 }
 
 now.userid = userid
-now.url = '<%= url %>'
-gameid = '<%= url %>'
+now.url = '<%= urlD %>'
+gameid = '<%= urlD %>'
 
 now.updateTime = function(time){
   $("#timeDisplay").html(time);
@@ -362,7 +362,7 @@ $.gritter.add({
 });
 */
   $('#mainBody').html(userid + ", you've joined another game at " + qgameid + ", and hence can't continue playing this one.")
-  now.disconnect(userid, '<%= url %>')
+  now.disconnect(userid, '<%= urlD %>')
   throw new Error('Abort Javascript');
 }
 
@@ -627,7 +627,7 @@ collapseOrExpand($('#scoreBoardRegion'));
 </script>
 <body id='mainBody'>
 
-<iframe src="<%= url %>" class='fullscreen'>Your browser doesn't support iFrames.</iframe>
+<iframe src="http://gkovacs.xvm.mit.edu:8080/proxy/<%= urlD %>" class='fullscreen'>Your browser doesn't support iFrames.</iframe>
 
 <div class="drsElement" id="translateRegion" style="background: #b0c4de; background-color: #b0c4de;">
  <div class="drsMoveHandle" id="translateRegionBar">Translate</div>
