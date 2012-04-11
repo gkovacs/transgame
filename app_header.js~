@@ -31,6 +31,7 @@ var http = require('http'),
 	cluster = require('cluster'),
 	numCPUs = require('os').cpus().length;
 
+servername = fs.readFileSync(path.join(__dirname,'servername.txt')).toString()
 
 var redisO = require('redis')
 
@@ -123,6 +124,7 @@ var server = connect()
     }
     return
   }
+  /*
   if (request.url.indexOf('/nowjs') == 0) {
     if (nowjsData == '') {
       fs.readFile('nowjs/now.js', function(err, data) {
@@ -134,6 +136,7 @@ var server = connect()
     }
     return
   }
+  */
   //return
 
 	console.log("(" + process.pid + ") New Request: ", request.url);

@@ -32,6 +32,19 @@ translationsByOrderSubmitted = []
 userToTranslation = {}
 translationToUserList = {}
 
+function getBestTranslation() {
+  var bestTranslation = ''
+  var bestNumVotes = 0
+  for (var translation in translationsByOrderSubmitted) {
+    var numVotes = translationToUserList[translation].length
+    if (numVotes > bestNumVotes) {
+      bestTranslation = translation
+      bestNumVotes = numVotes
+    }
+  }
+  return bestTranslation
+}
+
 var curtime = 0
 setInterval(function() {
 //var curtime = Math.round((new Date()).getTime() / 1000);
@@ -41,10 +54,13 @@ if (curtime == 0) {
     nowjs.getGroup(gameid).now.askForTextSuggestions()
     return;
   }
+  if (textBeingTranslated != '') {
   // store translated stuff for persistence
   client.set(gameid + '|' + textBeingTranslated, JSON.stringify({'translationToUserList': translationToUserList, 'translationsByOrderSubmitted': translationsByOrderSubmitted, 'userToTranslation': userToTranslation}))
-  
+  var bestTranslation = getBestTranslation()
+  nowjs.getGroup(gameid).now.sendFinalTranslation(textBeingTranslated, bestTranslation)
   updateScores()
+  }
   
   var selectedUserIdx = [Math.floor(Math.random()*users.length)];
   contributingUser = users[selectedUserIdx];

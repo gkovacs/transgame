@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8">
     <title>TransGame</title>
-<!--<style type="text/css" src='http://gkovacs.xvm.mit.edu/transgame/jquery-ui.css'></style>-->
-<!--<style type="text/css" src='http://gkovacs.xvm.mit.edu/transgame/ui.notify.css'></style>-->
-<link rel="stylesheet" type="text/css" href="http://gkovacs.xvm.mit.edu/transgame/css/jquery.gritter.css" />
+<!--<style type="text/css" src='http://<%= servername =>/transgame/jquery-ui.css'></style>-->
+<!--<style type="text/css" src='http://<%= servername =>/transgame/ui.notify.css'></style>-->
+<link rel="stylesheet" type="text/css" href="http://<%= servername =>/transgame/css/jquery.gritter.css" />
 <style type="text/css">
 
 /* Apply the element you want to drag/resize */
@@ -282,16 +282,16 @@ margin:auto;"
 }
 </style>
 </head>
-<script src="http://gkovacs.xvm.mit.edu/transgame/jquery.min.js"></script>
-<script src="http://gkovacs.xvm.mit.edu/transgame/jquery.cookie.js"></script>
-<!--<script src="http://gkovacs.xvm.mit.edu/transgame/jquery-ui.min.js"></script>-->
-<script src="http://gkovacs.xvm.mit.edu/transgame/jquery.gritter.min.js"></script>
-<!--<script src="http://gkovacs.xvm.mit.edu/transgame/jquery.notify.js"></script>-->
-<script src="http://gkovacs.xvm.mit.edu/transgame/etherpad.js"></script>
-<script src="http://gkovacs.xvm.mit.edu/transgame/base64.js"></script>
-<script src="http://gkovacs.xvm.mit.edu/transgame/md5.js"></script>
-<script src="http://gkovacs.xvm.mit.edu/transgame/dragresize.js"></script>
-<script src="http://gkovacs.xvm.mit.edu:9000/nowjs/now.js"></script>
+<script src="http://<%= servername =>/transgame/jquery.min.js"></script>
+<script src="http://<%= servername =>/transgame/jquery.cookie.js"></script>
+<!--<script src="http://<%= servername =>/transgame/jquery-ui.min.js"></script>-->
+<script src="http://<%= servername =>/transgame/jquery.gritter.min.js"></script>
+<!--<script src="http://<%= servername =>/transgame/jquery.notify.js"></script>-->
+<script src="http://<%= servername =>/transgame/etherpad.js"></script>
+<script src="http://<%= servername =>/transgame/base64.js"></script>
+<script src="http://<%= servername =>/transgame/md5.js"></script>
+<script src="http://<%= servername =>/transgame/dragresize.js"></script>
+<script src="http://<%= servername =>:9000/nowjs/now.js"></script>
 <script>
 
 String.prototype.replaceAll = function (replaceThis, withThis) {
@@ -301,7 +301,7 @@ String.prototype.replaceAll = function (replaceThis, withThis) {
 userid = $.cookie('transgame_userid');
 if (userid == null) {
   alert('warning: no userid, going back to login page');
-  window.location = 'http://gkovacs.xvm.mit.edu/transgame/index.html';
+  window.location = 'http://<%= servername =>/transgame/index.html';
   //userid = Math.floor(Math.random()*10000001);
   //$.cookie('transgame_userid', userid, { expires: 7, path: '/' });
 }
@@ -393,14 +393,14 @@ return false;
 }
 
 function submitStartTimer() {
-$.get('http://gkovacs.xvm.mit.edu/transgame/startround.cgi.py?gameid=<%= gameidsubs %>', function(data) {
+$.get('http://<%= servername =>/transgame/startround.cgi.py?gameid=<%= gameidsubs %>', function(data) {
 console.log(data);
 });
 return false;
 }
 
 function submitSwitchRound() {
-$.get('http://gkovacs.xvm.mit.edu/transgame/switchround.cgi.py?gameid=<%= gameidsubs %>', function(data) {
+$.get('http://<%= servername =>/transgame/switchround.cgi.py?gameid=<%= gameidsubs %>', function(data) {
 console.log(data);
 });
 return false;
@@ -408,7 +408,7 @@ return false;
 
 function sendTranslation(translation) {
 now.submitTranslation(translation, userid)
-//$.get('http://gkovacs.xvm.mit.edu/transgame/translate.cgi.py?gameid=<%= gameidsubs %>&userid=' + userid + '&text=' + encode64(textBeingTranslated) + '&translation=' + translation, function(data) {
+//$.get('http://<%= servername =>/transgame/translate.cgi.py?gameid=<%= gameidsubs %>&userid=' + userid + '&text=' + encode64(textBeingTranslated) + '&translation=' + translation, function(data) {
 //console.log(data);
 //});
 }
@@ -428,7 +428,7 @@ prevVotingRegionHTML = '';
 
 /*
 function reloadTime() {
-$.get('http://gkovacs.xvm.mit.edu/transgame/timeleft.cgi.py?gameid=<%= gameidsubs %>', function(data) {
+$.get('http://<%= servername =>/transgame/timeleft.cgi.py?gameid=<%= gameidsubs %>', function(data) {
 console.log(data);
 timeleft = parseInt(data)
 timeleft += Math.round(0.1*textBeingTranslated.length);
@@ -438,6 +438,11 @@ $('#timeDisplay').html(data);
 
 }
 */
+
+now.sendFinalTranslation = function(textBeingTranslated, bestTranslation) {
+  var newText = frames['frameConts'].document.body.innerHTML.replaceAll(textBeingTranslated, bestTranslation)
+  frames['frameConts'].document.body.innerHTML = newText
+}
 
 now.sendUserTranslations = function(translationToUserList, translationsByOrderSubmitted) {
   var htmlpage = '<div id="navcontainer"><ul class="navlist">';
@@ -462,11 +467,11 @@ now.sendUserTranslations = function(translationToUserList, translationsByOrderSu
     }
     var numNoVotes = 5 - numVotes;
     for (var j = 0; j < numNoVotes; ++j) {
-      curhtml += '<img src="http://gkovacs.xvm.mit.edu/transgame/novote.png" />';
+      curhtml += '<img src="http://<%= servername =>/transgame/novote.png" />';
     }
     for (var j = 0; j < numVotes; ++j) {
       var votingUserName = votingUsers[j];
-      curhtml += '<img src="http://gkovacs.xvm.mit.edu/transgame/plusvote.png" title="' + votingUserName + '" alt="' + votingUserName + '" />';
+      curhtml += '<img src="http://<%= servername =>/transgame/plusvote.png" title="' + votingUserName + '" alt="' + votingUserName + '" />';
     }
     
     
@@ -506,13 +511,14 @@ function collapseOrExpand(elem) {
 
 function setTextBeingTranslated(text, userSuggestingText) {
   textBeingTranslated = text;
-  var newText = frames['frameConts'].document.body.innerHTML.replaceAll('<!--gHighlightStart--><span style="background-color: yellow">', '').replaceAll('</span><!--gHighlightEnd-->', '')
-  newText = newText.replaceAll(text, '<!--gHighlightStart--><span style="background-color: yellow">' + text + '</span><!--gHighlightEnd-->')
-  frames['frameConts'].document.body.innerHTML = newText
   if (text == '') {
     $('#text_being_translated').html('')
   } else {
     $('#text_being_translated').html('<b>' + textBeingTranslated + '</b>' + ' <i>(suggested by ' + userSuggestingText + ')</i>');
+  var newText = frames['frameConts'].document.body.innerHTML.replaceAll('<!--gHighlightStart--><span style="background-color: yellow">', '').replaceAll('</span><!--gHighlightEnd-->', '')
+  newText = newText.replaceAll(text, '<!--gHighlightStart--><span style="background-color: yellow">' + text + '</span><!--gHighlightEnd-->')
+  frames['frameConts'].document.body.innerHTML = newText
+  console.log('set text being translated to ' + text)
   }
 }
 
@@ -634,7 +640,7 @@ collapseOrExpand($('#scoreBoardRegion'));
 </script>
 <body id='mainBody'>
 
-<iframe src="http://gkovacs.xvm.mit.edu:8080/proxy/<%= urlD %>" class='fullscreen' id='frameConts'>Your browser doesn't support iFrames.</iframe>
+<iframe src="http://<%= servername =>:8080/proxy/<%= urlD %>" class='fullscreen' id='frameConts'>Your browser doesn't support iFrames.</iframe>
 
 <div class="drsElement" id="translateRegion" style="background: #b0c4de; background-color: #b0c4de;">
  <div class="drsMoveHandle" id="translateRegionBar">Translate</div>

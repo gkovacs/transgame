@@ -31,6 +31,7 @@ var http = require('http'),
 	cluster = require('cluster'),
 	numCPUs = require('os').cpus().length;
 
+servername = fs.readFileSync(path.join(__dirname,'servername.txt')).toString().trim()
 
 var redisO = require('redis')
 
