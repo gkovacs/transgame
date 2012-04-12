@@ -439,10 +439,12 @@ $('#timeDisplay').html(data);
 }
 */
 
+/*
 now.sendFinalTranslation = function(textBeingTranslated, bestTranslation) {
   var newText = frames['frameConts'].document.body.innerHTML.replaceAll(textBeingTranslated, bestTranslation)
   frames['frameConts'].document.body.innerHTML = newText
 }
+*/
 
 now.sendUserTranslations = function(translationToUserList, translationsByOrderSubmitted) {
   var htmlpage = '<div id="navcontainer"><ul class="navlist">';
@@ -467,11 +469,11 @@ now.sendUserTranslations = function(translationToUserList, translationsByOrderSu
     }
     var numNoVotes = 5 - numVotes;
     for (var j = 0; j < numNoVotes; ++j) {
-      curhtml += '<img src="http://<%= servername %>/transgame/novote.png" />';
+      curhtml += '<img src="http://<%= servername %>/transgame/not-moderated.png" style="float: left" />';
     }
     for (var j = 0; j < numVotes; ++j) {
       var votingUserName = votingUsers[j];
-      curhtml += '<img src="http://<%= servername %>/transgame/plusvote.png" title="' + votingUserName + '" alt="' + votingUserName + '" />';
+      curhtml += '<img src="http://<%= servername %>/transgame/accurate-moderated.png" style="float: left" title="' + votingUserName + '" alt="' + votingUserName + '" />';
     }
     
     
@@ -515,9 +517,9 @@ function setTextBeingTranslated(text, userSuggestingText) {
     $('#text_being_translated').html('')
   } else {
     $('#text_being_translated').html('<b>' + textBeingTranslated + '</b>' + ' <i>(suggested by ' + userSuggestingText + ')</i>');
-  var newText = frames['frameConts'].document.body.innerHTML.replaceAll('<!--gHighlightStart--><span style="background-color: yellow">', '').replaceAll('</span><!--gHighlightEnd-->', '')
-  newText = newText.replaceAll(text, '<!--gHighlightStart--><span style="background-color: yellow">' + text + '</span><!--gHighlightEnd-->')
-  frames['frameConts'].document.body.innerHTML = newText
+  //var newText = frames['frameConts'].document.body.innerHTML.replaceAll('<!--gHighlightStart--><span style="background-color: yellow">', '').replaceAll('</span><!--gHighlightEnd-->', '')
+  //newText = newText.replaceAll(text, '<!--gHighlightStart--><span style="background-color: yellow">' + text + '</span><!--gHighlightEnd-->')
+  //frames['frameConts'].document.body.innerHTML = newText
   console.log('set text being translated to ' + text)
   }
 }
@@ -640,7 +642,7 @@ collapseOrExpand($('#scoreBoardRegion'));
 </script>
 <body id='mainBody'>
 
-<iframe src="http://<%= servername %>:8080/proxy/<%= urlD %>" class='fullscreen' id='frameConts'>Your browser doesn't support iFrames.</iframe>
+<iframe src="<%= urlD %>" class='fullscreen' id='frameConts'>Your browser doesn't support iFrames.</iframe>
 
 <div class="drsElement" id="translateRegion" style="background: #b0c4de; background-color: #b0c4de;">
  <div class="drsMoveHandle" id="translateRegionBar">Translate</div>
