@@ -413,6 +413,10 @@ now.submitTranslation(translation, userid)
 //});
 }
 
+function sendTranslationEscaped(translation) {
+sendTranslation(unescape(translation))
+}
+
 function rpartition(s, sep) {
 l = s.split(sep);
 right = l[l.length - 1];
@@ -439,28 +443,30 @@ $('#timeDisplay').html(data);
 }
 */
 
+/*
 now.sendFinalTranslation = function(textBeingTranslated, bestTranslation) {
   var newText = frames['frameConts'].document.body.innerHTML.replaceAll(textBeingTranslated, bestTranslation)
   frames['frameConts'].document.body.innerHTML = newText
 }
+*/
 
 now.sendUserTranslations = function(translationToUserList, translationsByOrderSubmitted) {
   var htmlpage = '<div id="navcontainer"><ul class="navlist">';
-  var byVotes = []
+  var byVotes = [];
   for (var i = 0; i < translationsByOrderSubmitted.length; ++i) {
-    var translation = translationsByOrderSubmitted[i]
-    var votingUsers = translationToUserList[translation]
+    var translation = translationsByOrderSubmitted[i];
+    var votingUsers = translationToUserList[translation];
     if (votingUsers == null)
-      continue
-    var contributingUser = votingUsers[0]
+      continue;
+    var contributingUser = votingUsers[0];
     if (contributingUser == null)
-      continue
+      continue;
     
     var spanClass = '';
     if ($.inArray(userid, votingUsers) != -1) {
       spanClass = 'class="selectedTrans"';
     }
-    var curhtml = '<li onclick="sendTranslation(\'' + translation + '\')" ' + spanClass + ' >';
+    var curhtml = '<li onclick="sendTranslationEscaped(\'' + escape(translation) + '\')" ' + spanClass + ' >';
     var numVotes = votingUsers.length;
     if (numVotes > 5) {
       numVotes = 5;
@@ -474,6 +480,8 @@ now.sendUserTranslations = function(translationToUserList, translationsByOrderSu
       curhtml += '<img src="http://<%= servername %>/transgame/accurate-moderated.png" style="float: left" title="' + votingUserName + '" alt="' + votingUserName + '" />';
     }
     
+    curhtml += '<img src="http://<%= servername %>/transgame/check_22.png" style="float: left" title="Vote as accurate" alt="Vote as accurate" />';
+    curhtml += '<img src="http://<%= servername %>/transgame/smiley_22.png" style="float: left" title="Vote as funny" alt="Vote as funny" />';
     
     curhtml += translation + ' (<i>' + contributingUser + '</i>)</li>';
     byVotes[byVotes.length] = [votingUsers.length, curhtml];
@@ -497,6 +505,14 @@ function showOrHide(elem) {
   }
 }
 
+function getFrameHTML() {
+return frames['frameConts'].document.body.innerHTML;
+}
+
+function setFrameHTML(nval) {
+frames['frameConts'].document.body.innerHTML = nval;
+}
+
 collapsedElemHeights = {}
 
 function collapseOrExpand(elem) {
@@ -515,9 +531,11 @@ function setTextBeingTranslated(text, userSuggestingText) {
     $('#text_being_translated').html('')
   } else {
     $('#text_being_translated').html('<b>' + textBeingTranslated + '</b>' + ' <i>(suggested by ' + userSuggestingText + ')</i>');
-  //var newText = frames['frameConts'].document.body.innerHTML.replaceAll('<!--gHighlightStart--><span style="background-color: yellow">', '').replaceAll('</span><!--gHighlightEnd-->', '')
-  //newText = newText.replaceAll(text, '<!--gHighlightStart--><span style="background-color: yellow">' + text + '</span><!--gHighlightEnd-->')
-  //frames['frameConts'].document.body.innerHTML = newText
+  var gHS = '<'
+  gHS += '!--gHighlightStart-->'
+  var newText = getFrameHTML().replaceAll(gHS + '<span style="background-color: yellow">', '').replaceAll('</span>' + gHS, '')
+  newText = newText.replaceAll(text, gHS + '<span style="background-color: yellow">' + text + '</span>' + gHS);
+  setFrameHTML(newText);
   console.log('set text being translated to ' + text)
   }
 }
@@ -640,7 +658,7 @@ collapseOrExpand($('#scoreBoardRegion'));
 </script>
 <body id='mainBody'>
 
-<iframe src="<%= urlD %>" class='fullscreen' id='frameConts'>Your browser doesn't support iFrames.</iframe>
+<iframe src="http://<%= servername %>:8080/proxy/<%= urlD %>" class='fullscreen' id='frameConts'>Your browser doesn't support iFrames.</iframe>
 
 <div class="drsElement" id="translateRegion" style="background: #b0c4de; background-color: #b0c4de;">
  <div class="drsMoveHandle" id="translateRegionBar">Translate</div>

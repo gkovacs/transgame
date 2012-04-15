@@ -60,6 +60,8 @@ $(document).ready(function(){
 
 $('#welcome').html('Welcome, ' + userid + '. Please pick an existing game to join, or enter a new URL.');
 
+$('#chatRegionContents').pad({'padId':'transgame-lobby', 'height': '300px', 'width': '100%', 'userName': userid, 'showChat': true});
+
 });
 
 </script>
@@ -69,6 +71,9 @@ $('#welcome').html('Welcome, ' + userid + '. Please pick an existing game to joi
 <form name="frm1" action="" onsubmit="return gotoPage()">
 URL to translate: <input type="text" name="urlToTranslate" />
 <input type="submit" value="Start New Translation Game" /></form><br/>
+Chat:<br/>
+<div id="chatRegionContents" style="height: 300px; width: 100%"></div>
+Games: <br/>
 <div id='gameListDisplay'></div>
 
 </body>

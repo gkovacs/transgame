@@ -70,6 +70,10 @@ var lobbyData = ''
 var indexData = ''
 var nowjsData = ''
 
+function silentConsoleLog(data) {
+
+}
+
 function writeResponse(response, data) {
   response.writeHead(200, {
       'Content-Type': 'text/html'
@@ -139,7 +143,7 @@ var server = connect()
   */
   //return
 
-	console.log("(" + process.pid + ") New Request: ", request.url);
+	silentConsoleLog("(" + process.pid + ") New Request: ", request.url);
 	
 	
     incrementRequests();
@@ -242,7 +246,7 @@ function proxy(request, response) {
 	// (assume / path and same domain as request's referer)
 	headers.cookie = getCookies(request, uri);
 	
-	console.log("sending these cookies: " + headers.cookie);
+	silentConsoleLog("sending these cookies: " + headers.cookie);
 	
 	// overwrite the referer with the correct referer
 	if(request.headers.referer){
@@ -295,7 +299,7 @@ function proxy(request, response) {
 		// todo: also fix refresh and url headers
 		if(headers.location && headers.location.substr(0,4) == 'http'){
 			headers.location = thisSite(request) + "/" + headers.location;
-			console.log("fixing redirect");
+			silentConsoleLog("fixing redirect");
 		}
 		
 		if(headers['set-cookie']){
@@ -306,9 +310,9 @@ function proxy(request, response) {
 		//  fire off out (possibly modified) headers
 		response.writeHead(remote_response.statusCode, headers);
 		
-		//console.log("content-type: " + ct);
-		//console.log("needs_parsed: " + needs_parsed);
-		//console.log("needs_decoded: " + needs_decoded);
+		//silentConsoleLog("content-type: " + ct);
+		//silentConsoleLog("needs_parsed: " + needs_parsed);
+		//silentConsoleLog("needs_decoded: " + needs_decoded);
 		
 		
 		// sometimes a chunk will end in data that may need to be modified, but it is impossible to tell
@@ -317,7 +321,7 @@ function proxy(request, response) {
 		
 		// todo : account for varying encodings
 		function parse(chunk){
-			//console.log("data event", request.url, chunk.toString());
+			//silentConsoleLog("data event", request.url, chunk.toString());
 			
 			// stringily our chunk and grab the previous chunk (if any)
 			chunk = chunk.toString();
@@ -335,7 +339,7 @@ function proxy(request, response) {
 			
 			// if we're in a stylesheet, run a couple of extra regexs to avoid 302's
 			if(ct == 'text/css'){
-				console.log('running css rules');
+				silentConsoleLog('running css rules');
 				chunk = chunk.replace(re_css_abs, "$1" + thisSite(request) + "/$2");
 				chunk = chunk.replace(re_css_rel_root, "$1" + thisSite(request) + "/" + uri.protocol + "//" + uri.hostname + "$2");			
 			}
@@ -469,7 +473,7 @@ function getCookies(request, uri){
 * Parses the set-cookie header from the remote server and stores the cookies in the user's session
 */
 function storeCookies(request, uri, cookies){
-	console.log('storing these cookies: ', cookies);
+	silentConsoleLog('storing these cookies: ', cookies);
 
 	if(!cookies) return;
 	
@@ -502,7 +506,7 @@ function storeCookies(request, uri, cookies){
 		// now that the cookie is set (deleting any older cookie of the same name), 
 		// check the expiration date and delete it if it is outdated
 		if(isExpired(thisCookie)){
-			console.log('deleting cookie', thisCookie.expires);
+			silentConsoleLog('deleting cookie', thisCookie.expires);
 			delete request.session[domain][thisCookie.path][thisCookie.name];
 		}
 
@@ -600,7 +604,7 @@ function redirectTo(request, response, site){
 	if(site == "/") site = ""; // no endless redirect loops
 	try {
 		response.writeHead('302', {'Location': thisSite(request) + site});
-		console.log("recirecting to " + thisSite(request) + site);
+		silentConsoleLog("recirecting to " + thisSite(request) + site);
 	} catch(ex) {
 		// the headers were already sent - we can't redirect them
 		console.error("Failed to send redirect", ex);
@@ -704,18 +708,18 @@ var waitingStatusResponses = [];
 
 // simple way to get the curent status of the server
 function status(request, response){
-	console.log("status request recieved on pid " + process.pid);
+	silentConsoleLog("status request recieved on pid " + process.pid);
 	response.writeHead("200", {"Content-Type": "text/plain", "Expires": 0});
 	
 	// only send out a new status request if we don't already have one in the pipe
 	if(waitingStatusResponses.length == 0) {
-		console.log("sending status request message");
+		silentConsoleLog("sending status request message");
 		process.send({type: "status.request", from: process.pid});
 	}
 	
 	// 1 second timeout in case the master doesn't respond quickly enough
 	response.timeout = setTimeout(function(){
-		console.log("Error: status responses timeout reached");
+		silentConsoleLog("Error: status responses timeout reached");
 		sendStatus({error: "No response from the cluster master after 1 second"});
 	}, 1000);
 	
@@ -809,7 +813,7 @@ if (cluster.isMaster) {
 				return;
 			}
 			
-			console.log('message recieved by master ', message);
+			silentConsoleLog('message recieved by master ', message);
 			
 			// if it's a status request sent to everyone, respond with the master's status before passing it along
 			if (message.type == "status.request") {
@@ -874,7 +878,7 @@ if (cluster.isMaster) {
 	// if we're a worker, read the index file and then fire up the server
 	setupIndex();
 	http.Server(server).listen(config.port, config.ip);
-	console.log('node-unblocker proxy server with pid ' + process.pid + ' running on ' + 
+	silentConsoleLog('node-unblocker proxy server with pid ' + process.pid + ' running on ' + 
 		((config.ip) ? config.ip + ":" : "port ") + config.port
 	);
 	
@@ -882,7 +886,7 @@ if (cluster.isMaster) {
 		if (!message.type) {
 			return;
 		}
-		console.log("messge recieved by child (" + process.pid + ") ", message);
+		silentConsoleLog("messge recieved by child (" + process.pid + ") ", message);
 		if (message.type == "status.response") {
 			sendStatus(message);
 		}
@@ -896,8 +900,48 @@ console.log('nowjs server started on port 9000')
 
 client = redisO.createClient()
 
-function removeElement(arrayElement, arrayName) {
-  arrayName.splice($.inArray(arrayElement, arrayName), 1)
+Array.prototype.remove = function(elem) {
+    var match = -1;
+
+    while( (match = this.indexOf(elem)) > -1 ) {
+        this.splice(match, 1);
+    }
+};
+
+function clearDict(dic) {
+  var keys = dictKeys(dic)
+  for (var i = 0; i < keys.length; ++i) {
+    var key = keys[i]
+    delete dic[key]
+  }
+}
+
+function copyDict(src, dst) {
+  clearDict(dst)
+  var keys = dictKeys(src)
+  for (var i = 0; i < keys.length; ++i) {
+    var key = keys[i]
+    dst[key] = src[key]
+  }
+}
+
+function copyArray(src, dst) {
+  dst.length = 0
+  for (var i = 0; i < src.length; ++i) {
+    dst[i] = src[i]
+  }
+}
+
+function dictKeys(dic)
+{
+  var keys = [];
+  for (var i in dic)
+  {
+    if (dic.hasOwnProperty(i) && dic[i] != null) {
+      keys.push(i);
+    }
+  }
+  return keys;
 }
 
 userScores = {}
@@ -926,7 +970,10 @@ translationToUserList = {}
 function getBestTranslation() {
   var bestTranslation = ''
   var bestNumVotes = 0
-  for (var translation in translationsByOrderSubmitted) {
+  for (var i = 0; i < translationsByOrderSubmitted.length; ++i) {
+    var translation = translationsByOrderSubmitted[i]
+    if (translationToUserList[translation] == null)
+      continue
     var numVotes = translationToUserList[translation].length
     if (numVotes > bestNumVotes) {
       bestTranslation = translation
@@ -940,15 +987,18 @@ var curtime = 0
 setInterval(function() {
 //var curtime = Math.round((new Date()).getTime() / 1000);
 if (curtime == 0) {
-  var users = Object.keys(userToSuggestedText);
+  var users = dictKeys(userToSuggestedText);
   if (users.length == 0) {
     nowjs.getGroup(gameid).now.askForTextSuggestions()
     return;
   }
+  console.log(users)
   if (textBeingTranslated != '') {
   // store translated stuff for persistence
+  console.log('storing stuff for persistence')
   client.set(gameid + '|' + textBeingTranslated, JSON.stringify({'translationToUserList': translationToUserList, 'translationsByOrderSubmitted': translationsByOrderSubmitted, 'userToTranslation': userToTranslation}))
   var bestTranslation = getBestTranslation()
+  console.log(bestTranslation)
   nowjs.getGroup(gameid).now.sendFinalTranslation(textBeingTranslated, bestTranslation)
   updateScores()
   }
@@ -969,15 +1019,19 @@ nowjs.getGroup(gameid).now.updateTime(curtime);
 
 function newRound(gameid) {
   nowjs.getGroup(gameid).now.setTextToBeTranslated(textBeingTranslated, contributingUser);
-  translationsByOrderSubmitted = []
-  userToTranslation = {}
-  translationToUserList = {}
+  translationsByOrderSubmitted.length = 0
+  clearDict(userToTranslation)
+  clearDict(translationToUserList)
+  console.log('newround gameid: ' + gameid)
+  console.log('newround textBeingTranslated: ' + textBeingTranslated)
   client.get(gameid + '|' + textBeingTranslated, function(err,res) {
     if (res != null) {
       var pd = JSON.parse(res)
-      userToTranslation = pd.userToTranslation
-      translationToUserList = pd.translationToUserList
-      translationsByOrderSubmitted = pd.translationsByOrderSubmitted
+      console.log('newround pd: ' + pd)
+      copyDict(pd.userToTranslation, userToTranslation)
+      copyDict(pd.translationToUserList, translationToUserList)
+      copyArray(pd.translationsByOrderSubmitted, translationsByOrderSubmitted)
+      console.log('newround translationToUserList: ' + translationToUserList)
       nowjs.getGroup(gameid).now.sendUserTranslations(translationToUserList, translationsByOrderSubmitted)
     }
   });
@@ -985,9 +1039,12 @@ function newRound(gameid) {
 
 function updateScores() {
   $.each(translationToUserList, function(translation,voters) {
+    if (voters == null)
+      return
     if (voters.length < 1)
       return
-    for (var userid in voters) {
+    for (var i = 0; i < voters.length; ++i) {
+      var userid = voters[i]
       if (userScores[userid] == null)
         userScores[userid] = 0
     }
@@ -1013,7 +1070,7 @@ nowjs.getGroup(gameid).now.submitTranslation = function(text, userid) {
     return
   }
   if (prevTranslation != null) {
-    removeElement(userid, translationToUserList[prevTranslation])
+    translationToUserList[prevTranslation].remove(userid)
   }
   if (text == '') {
     
@@ -1071,10 +1128,10 @@ nowjs.on("connect", function(){
 });
 
 function disconnect(userid, url) {
-  removeElement(userid, gameToUsers[url])
+  gameToUsers[url].remove(userid)
   everyone.now.sendGameList(gameToUsers, gameList)
   
-  removeElement(userid, userList)
+  userList.remove(userid)
   //userScores[userid] = 0
   everyone.now.sendNewScores(userScores, userList)
   console.log('disconnected ' + userid)

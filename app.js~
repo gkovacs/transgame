@@ -31,7 +31,7 @@ var http = require('http'),
 	cluster = require('cluster'),
 	numCPUs = require('os').cpus().length;
 
-servername = fs.readFileSync(path.join(__dirname,'servername.txt')).toString()
+servername = fs.readFileSync(path.join(__dirname,'servername.txt')).toString().trim()
 
 var redisO = require('redis')
 
@@ -896,8 +896,44 @@ console.log('nowjs server started on port 9000')
 
 client = redisO.createClient()
 
-function removeElement(arrayElement, arrayName) {
-  arrayName.splice($.inArray(arrayElement, arrayName), 1)
+Array.prototype.remove = function(elem) {
+    var match = -1;
+
+    while( (match = this.indexOf(elem)) > -1 ) {
+        this.splice(match, 1);
+    }
+};
+
+function clearDict(dic) {
+  for (var key in dictKeys(dic)) {
+    delete dic[key]
+  }
+}
+
+function copyDict(src, dst) {
+  clearDict(dst)
+  for (var key in dictKeys(src)) {
+    dst[key] = src[key]
+  }
+}
+
+function copyArray(src, dst) {
+  dst.length = 0
+  for (var i = 0; i < src.length; ++i) {
+    dst[i] = src[i]
+  }
+}
+
+function dictKeys(dic)
+{
+  var keys = [];
+  for (var i in dic)
+  {
+    if (dic.hasOwnProperty(i)) {
+      keys.push(i);
+    }
+  }
+  return keys;
 }
 
 userScores = {}
@@ -927,6 +963,8 @@ function getBestTranslation() {
   var bestTranslation = ''
   var bestNumVotes = 0
   for (var translation in translationsByOrderSubmitted) {
+    if (translationToUserList[translation] == null)
+      continue
     var numVotes = translationToUserList[translation].length
     if (numVotes > bestNumVotes) {
       bestTranslation = translation
@@ -940,15 +978,17 @@ var curtime = 0
 setInterval(function() {
 //var curtime = Math.round((new Date()).getTime() / 1000);
 if (curtime == 0) {
-  var users = Object.keys(userToSuggestedText);
+  var users = dictKeys(userToSuggestedText);
   if (users.length == 0) {
     nowjs.getGroup(gameid).now.askForTextSuggestions()
     return;
   }
+  console.log(users)
   if (textBeingTranslated != '') {
   // store translated stuff for persistence
   client.set(gameid + '|' + textBeingTranslated, JSON.stringify({'translationToUserList': translationToUserList, 'translationsByOrderSubmitted': translationsByOrderSubmitted, 'userToTranslation': userToTranslation}))
   var bestTranslation = getBestTranslation()
+  console.log(bestTranslation)
   nowjs.getGroup(gameid).now.sendFinalTranslation(textBeingTranslated, bestTranslation)
   updateScores()
   }
@@ -969,15 +1009,15 @@ nowjs.getGroup(gameid).now.updateTime(curtime);
 
 function newRound(gameid) {
   nowjs.getGroup(gameid).now.setTextToBeTranslated(textBeingTranslated, contributingUser);
-  translationsByOrderSubmitted = []
-  userToTranslation = {}
-  translationToUserList = {}
+  translationsByOrderSubmitted.length = 0
+  clearDict(userToTranslation)
+  clearDict(translationToUserList)
   client.get(gameid + '|' + textBeingTranslated, function(err,res) {
     if (res != null) {
       var pd = JSON.parse(res)
-      userToTranslation = pd.userToTranslation
-      translationToUserList = pd.translationToUserList
-      translationsByOrderSubmitted = pd.translationsByOrderSubmitted
+      copyDict(pd.userToTranslation, userToTranslation)
+      copyDict(pd.translationToUserList, translationToUserList)
+      copyArray(pd.translationsByOrderSubmitted, translationsByOrderSubmitted)
       nowjs.getGroup(gameid).now.sendUserTranslations(translationToUserList, translationsByOrderSubmitted)
     }
   });
@@ -985,6 +1025,8 @@ function newRound(gameid) {
 
 function updateScores() {
   $.each(translationToUserList, function(translation,voters) {
+    if (voters == null)
+      return
     if (voters.length < 1)
       return
     for (var userid in voters) {
@@ -1013,7 +1055,7 @@ nowjs.getGroup(gameid).now.submitTranslation = function(text, userid) {
     return
   }
   if (prevTranslation != null) {
-    removeElement(userid, translationToUserList[prevTranslation])
+    translationToUserList[prevTranslation].remove(userid)
   }
   if (text == '') {
     
@@ -1071,10 +1113,10 @@ nowjs.on("connect", function(){
 });
 
 function disconnect(userid, url) {
-  removeElement(userid, gameToUsers[url])
+  gameToUsers[url].remove(userid)
   everyone.now.sendGameList(gameToUsers, gameList)
   
-  removeElement(userid, userList)
+  userList.remove(userid)
   //userScores[userid] = 0
   everyone.now.sendNewScores(userScores, userList)
   console.log('disconnected ' + userid)
