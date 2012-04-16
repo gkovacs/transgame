@@ -443,12 +443,10 @@ $('#timeDisplay').html(data);
 }
 */
 
-/*
 now.sendFinalTranslation = function(textBeingTranslated, bestTranslation) {
-  var newText = frames['frameConts'].document.body.innerHTML.replaceAll(textBeingTranslated, bestTranslation)
-  frames['frameConts'].document.body.innerHTML = newText
+  var newText = getFrameHTML().replaceAll(textBeingTranslated, bestTranslation)
+  setFrameHTML(newText)
 }
-*/
 
 now.sendUserTranslations = function(translationToUserList, translationsByOrderSubmitted) {
   var htmlpage = '<div id="navcontainer"><ul class="navlist">';
@@ -513,6 +511,41 @@ function setFrameHTML(nval) {
 frames['frameConts'].document.body.innerHTML = nval;
 }
 
+function getFrameDom() {
+return frames['frameConts'].document.body;
+}
+
+function getTreeWalker() {
+return document.createTreeWalker(
+        frames['frameConts'].document.body,
+        NodeFilter.SHOW_TEXT, 
+        null, 
+        false
+    );
+}
+
+function replaceFrameText(origtxt, newtxt) {
+  var walker = getTreeWalker()
+  var node;
+  while(node = walker.nextNode()) {
+    node.nodeValue = node.nodeValue.replaceAll(origtxt, newtxt)
+  }
+}
+
+function highlightFrameText(text) {
+  var walker = getTreeWalker()
+  var node;
+  var gHS = '<'
+  gHS += '!--gHighlightStart-->'
+  var newText = getFrameHTML().replaceAll(gHS + '<span style="background-color: yellow">', '').replaceAll('</span>' + gHS, '')
+  newText = newText.replaceAll(text, gHS + '<span style="background-color: yellow">' + text + '</span>' + gHS);
+  while (node = walker.nextNode()) {
+    var newText = node.parentElement.innerHTML.replaceAll(gHS + '<span style="background-color: yellow">', '').replaceAll('</span>' + gHS, '')
+    newText = newText.replaceAll(text, gHS + '<span style="background-color: yellow">' + text + '</span>' + gHS);
+    node.parentElement.innerHTML = newText
+  }
+}
+
 collapsedElemHeights = {}
 
 function collapseOrExpand(elem) {
@@ -531,11 +564,14 @@ function setTextBeingTranslated(text, userSuggestingText) {
     $('#text_being_translated').html('')
   } else {
     $('#text_being_translated').html('<b>' + textBeingTranslated + '</b>' + ' <i>(suggested by ' + userSuggestingText + ')</i>');
+  /*
   var gHS = '<'
   gHS += '!--gHighlightStart-->'
   var newText = getFrameHTML().replaceAll(gHS + '<span style="background-color: yellow">', '').replaceAll('</span>' + gHS, '')
   newText = newText.replaceAll(text, gHS + '<span style="background-color: yellow">' + text + '</span>' + gHS);
   setFrameHTML(newText);
+  */
+  highlightFrameText(text)
   console.log('set text being translated to ' + text)
   }
 }
