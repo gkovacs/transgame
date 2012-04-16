@@ -444,8 +444,9 @@ $('#timeDisplay').html(data);
 */
 
 now.sendFinalTranslation = function(textBeingTranslated, bestTranslation) {
-  var newText = getFrameHTML().replaceAll(textBeingTranslated, bestTranslation)
-  setFrameHTML(newText)
+  //var newText = getFrameHTML().replaceAll(textBeingTranslated, bestTranslation)
+  //setFrameHTML(newText)
+  replaceFrameText(textBeingTranslated, bestTranslation)
 }
 
 now.sendUserTranslations = function(translationToUserList, translationsByOrderSubmitted) {
@@ -532,17 +533,45 @@ function replaceFrameText(origtxt, newtxt) {
   }
 }
 
+function removeHighlights() {
+  var walker = getTreeWalker()
+  var node;
+  var gHSO = '<'
+  gHSO += '!--gHighlightStartOpen-->'
+  var gHEO = '<'
+  gHEO += '!--gHighlightEndOpen-->'
+  var gHSC = '<'
+  gHSC += '!--gHighlightStartClose-->'
+  var gHEC = '<'
+  gHEC += '!--gHighlightEncClose-->'
+  //var newText = getFrameHTML().replaceAll(gHSO + '<span style="background-color: yellow">' + gHEO, '').replaceAll(gHSC + '</span>' + gHEC, '')
+  //newText = newText.replaceAll(text, gHSO + '<span style="background-color: yellow">' + gHEO + text + gHSC + '</span>' + gHEC);
+  while (node = walker.nextNode()) {
+    if (node.parentElement != null) {
+      node.parentElement.innerHTML = node.parentElement.innerHTML.replaceAll(gHSO + '<span style="background-color: yellow">' + gHEO, '').replaceAll(gHSC + '</span>' + gHEC, '')
+    }
+  }
+}
+
 function highlightFrameText(text) {
   var walker = getTreeWalker()
   var node;
-  var gHS = '<'
-  gHS += '!--gHighlightStart-->'
-  var newText = getFrameHTML().replaceAll(gHS + '<span style="background-color: yellow">', '').replaceAll('</span>' + gHS, '')
-  newText = newText.replaceAll(text, gHS + '<span style="background-color: yellow">' + text + '</span>' + gHS);
+  var gHSO = '<'
+  gHSO += '!--gHighlightStartOpen-->'
+  var gHEO = '<'
+  gHEO += '!--gHighlightEndOpen-->'
+  var gHSC = '<'
+  gHSC += '!--gHighlightStartClose-->'
+  var gHEC = '<'
+  gHEC += '!--gHighlightEncClose-->'
+  //var newText = getFrameHTML().replaceAll(gHSO + '<span style="background-color: yellow">' + gHEO, '').replaceAll(gHSC + '</span>' + gHEC, '')
+  //newText = newText.replaceAll(text, gHSO + '<span style="background-color: yellow">' + gHEO + text + gHSC + '</span>' + gHEC);
   while (node = walker.nextNode()) {
-    var newText = node.parentElement.innerHTML.replaceAll(gHS + '<span style="background-color: yellow">', '').replaceAll('</span>' + gHS, '')
-    newText = newText.replaceAll(text, gHS + '<span style="background-color: yellow">' + text + '</span>' + gHS);
-    node.parentElement.innerHTML = newText
+    if (node.parentElement != null) {
+      if (node.nodeValue.indexOf(text) != -1) {
+        node.parentElement.innerHTML = node.parentElement.innerHTML.replaceAll(text, gHSO + '<span style="background-color: yellow">' + gHEO + text + gHSC + '</span>' + gHEC);
+      }
+    }
   }
 }
 
@@ -564,13 +593,6 @@ function setTextBeingTranslated(text, userSuggestingText) {
     $('#text_being_translated').html('')
   } else {
     $('#text_being_translated').html('<b>' + textBeingTranslated + '</b>' + ' <i>(suggested by ' + userSuggestingText + ')</i>');
-  /*
-  var gHS = '<'
-  gHS += '!--gHighlightStart-->'
-  var newText = getFrameHTML().replaceAll(gHS + '<span style="background-color: yellow">', '').replaceAll('</span>' + gHS, '')
-  newText = newText.replaceAll(text, gHS + '<span style="background-color: yellow">' + text + '</span>' + gHS);
-  setFrameHTML(newText);
-  */
   highlightFrameText(text)
   console.log('set text being translated to ' + text)
   }
