@@ -45,6 +45,10 @@ now.sendGameList = setGameList
 
 function gotoPage() {
 pageURL = document.forms["frm1"]["urlToTranslate"].value;
+if (pageURL == '') {
+$('#warnings').html("<span style='background: yellow'>You need to input a URL for a webpage to translate before you can start a new game.</span>");
+return false;
+}
 if (pageURL.indexOf('http://') != 0)
   pageURL = 'http://' + pageURL;
 //alert(pageURL);
@@ -58,7 +62,7 @@ now.ready(function() {
 
 $(document).ready(function(){
 
-$('#welcome').html('Welcome, ' + userid + '. Please pick an existing game to join, or enter a new URL.');
+$('#welcome').html('Welcome, ' + userid + '. Please pick an existing game to join, or enter a new URL for a webpage you would like to translate.');
 
 $('#chatRegionContents').pad({'padId':'transgame-lobby', 'height': '300px', 'width': '100%', 'userName': userid, 'showChat': true});
 
@@ -68,11 +72,12 @@ $('#chatRegionContents').pad({'padId':'transgame-lobby', 'height': '300px', 'wid
 <body>
 
 <div id='welcome'></div>
+<div id='warnings'></div>
 <form name="frm1" action="" onsubmit="return gotoPage()">
-URL to translate: <input type="text" name="urlToTranslate" />
+URL for webpage to translate: <input type="text" name="urlToTranslate" />
 <input type="submit" value="Start New Translation Game" /></form><br/>
 Chat:<br/>
-<div id="chatRegionContents" style="height: 300px; width: 100%">
+<div id="chatRegionContents" style="height: 300px; width: 100%"></div>
 Games: <br/>
 <div id='gameListDisplay'></div>
 
