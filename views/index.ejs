@@ -297,10 +297,10 @@ max-height: 100%;
 position: absolute;
 top: 0; 
 left: 0;
-width: 200px; /*Width of frame div*/
+width: 250px; /*Width of frame div*/
 height: 40%;
 overflow: auto; /*Disable scrollbars. Set to "scroll" to enable*/
-background: navy;
+background: green;
 color: white;
 }
 
@@ -308,17 +308,17 @@ color: white;
 position: absolute;
 top: 40%; 
 left: 0;
-width: 200px; /*Width of frame div*/
+width: 250px; /*Width of frame div*/
 height: 60%;
 overflow: hidden; /*Disable scrollbars. Set to "scroll" to enable*/
-background: navy;
+background: green;
 color: white;
 }
 
 #topcontent{
 position: fixed;
 top: 0; 
-left: 200px;
+left: 250px;
 right: 0;
 height: 40%;
 overflow: auto; /*Disable scrollbars. Set to "scroll" to enable*/
@@ -330,7 +330,7 @@ color: white;
 position: fixed;
 top: 40%;
 right: 0;
-left: 200px; /*Set right value to WidthOfFrameDiv*/
+left: 250px; /*Set right value to WidthOfFrameDiv*/
 bottom: 0;
 overflow: auto; 
 background: #fff;
@@ -854,7 +854,8 @@ Translation: <input type='text' name='add_translation' id='add_translation' styl
 </div>
 
 <div id="framecontent">
-<div style="text-align: center">Round ends in:</div><div id="timeDisplayContainer" style="text-align: center;" ><div id="timeDisplay" style="font-size: 26px; float: center">0</div><div style="float: right">seconds</div></div>
+<div style="text-align: center">Round ends in:</div><div id="timeDisplayContainer" style="text-align: center;" ><div id="timeDisplay" style="font-size: 26px; display: inline">0</div><div style="display: inline;">  seconds</div></div><br/>
+Scoreboard:
 <div id="scoreBoardRegionContents" ></div>
 </div>
 
