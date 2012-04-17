@@ -5,6 +5,18 @@ console.log('nowjs server started on port 9000')
 
 client = redisO.createClient()
 
+/*
+etherpadapi = require('etherpad-lite-client')
+
+etherpadapikey = fs.readFileSync(path.join(__dirname,'.etherpadapikey.txt')).toString().trim()
+
+etherpad = api.connect({
+  apikey: etherpadapikey,
+  host: 'transgame.csail.mit.edu',
+  port: 9001,
+})
+*/
+
 Array.prototype.remove = function(elem) {
     var match = -1;
 

@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8">
     <title>TransGame</title>
-<!--<style type="text/css" src='http://<%= servername %>/transgame/jquery-ui.css'></style>-->
-<!--<style type="text/css" src='http://<%= servername %>/transgame/ui.notify.css'></style>-->
-<link rel="stylesheet" type="text/css" href="http://<%= servername %>/transgame/css/jquery.gritter.css" />
+<!--<style type="text/css" src='jquery-ui.css'></style>-->
+<!--<style type="text/css" src='ui.notify.css'></style>-->
+<link rel="stylesheet" type="text/css" href="css/jquery.gritter.css" />
 <style type="text/css">
 
 /* Apply the element you want to drag/resize */
@@ -352,15 +352,15 @@ width: 100%;
 
 </style>
 </head>
-<script src="http://<%= servername %>/transgame/jquery.min.js"></script>
-<script src="http://<%= servername %>/transgame/jquery.cookie.js"></script>
-<!--<script src="http://<%= servername %>/transgame/jquery-ui.min.js"></script>-->
-<script src="http://<%= servername %>/transgame/jquery.gritter.min.js"></script>
-<!--<script src="http://<%= servername %>/transgame/jquery.notify.js"></script>-->
-<script src="http://<%= servername %>/transgame/etherpad.js"></script>
-<script src="http://<%= servername %>/transgame/base64.js"></script>
-<script src="http://<%= servername %>/transgame/md5.js"></script>
-<script src="http://<%= servername %>/transgame/dragresize.js"></script>
+<script src="jquery.min.js"></script>
+<script src="jquery.cookie.js"></script>
+<!--<script src="jquery-ui.min.js"></script>-->
+<script src="jquery.gritter.min.js"></script>
+<!--<script src="jquery.notify.js"></script>-->
+<script src="etherpad.js"></script>
+<script src="base64.js"></script>
+<script src="md5.js"></script>
+<script src="dragresize.js"></script>
 <script src="http://<%= servername %>:9000/nowjs/now.js"></script>
 <script>
 
@@ -371,7 +371,7 @@ String.prototype.replaceAll = function (replaceThis, withThis) {
 userid = $.cookie('transgame_userid');
 if (userid == null) {
   alert('warning: no userid, going back to login page');
-  window.location = 'http://<%= servername %>/transgame/index.html';
+  window.location = 'login.html';
   //userid = Math.floor(Math.random()*10000001);
   //$.cookie('transgame_userid', userid, { expires: 7, path: '/' });
 }
@@ -465,14 +465,14 @@ return false;
 }
 
 function submitStartTimer() {
-$.get('http://<%= servername %>/transgame/startround.cgi.py?gameid=<%= gameidsubs %>', function(data) {
+$.get('startround.cgi.py?gameid=<%= gameidsubs %>', function(data) {
 console.log(data);
 });
 return false;
 }
 
 function submitSwitchRound() {
-$.get('http://<%= servername %>/transgame/switchround.cgi.py?gameid=<%= gameidsubs %>', function(data) {
+$.get('switchround.cgi.py?gameid=<%= gameidsubs %>', function(data) {
 console.log(data);
 });
 return false;
@@ -480,7 +480,7 @@ return false;
 
 function sendTranslation(translation) {
 now.submitTranslation(translation, userid)
-//$.get('http://<%= servername %>/transgame/translate.cgi.py?gameid=<%= gameidsubs %>&userid=' + userid + '&text=' + encode64(textBeingTranslated) + '&translation=' + translation, function(data) {
+//$.get('translate.cgi.py?gameid=<%= gameidsubs %>&userid=' + userid + '&text=' + encode64(textBeingTranslated) + '&translation=' + translation, function(data) {
 //console.log(data);
 //});
 }
@@ -504,7 +504,7 @@ prevVotingRegionHTML = '';
 
 /*
 function reloadTime() {
-$.get('http://<%= servername %>/transgame/timeleft.cgi.py?gameid=<%= gameidsubs %>', function(data) {
+$.get('timeleft.cgi.py?gameid=<%= gameidsubs %>', function(data) {
 console.log(data);
 timeleft = parseInt(data)
 timeleft += Math.round(0.1*textBeingTranslated.length);
@@ -544,15 +544,15 @@ now.sendUserTranslations = function(translationToUserList, translationsByOrderSu
     }
     var numNoVotes = 5 - numVotes;
     for (var j = 0; j < numNoVotes; ++j) {
-      curhtml += '<img src="http://<%= servername %>/transgame/not-moderated.png" style="float: left" />';
+      curhtml += '<img src="not-moderated.png" style="float: left" />';
     }
     for (var j = 0; j < numVotes; ++j) {
       var votingUserName = votingUsers[j];
-      curhtml += '<img src="http://<%= servername %>/transgame/accurate-moderated.png" style="float: left" title="' + votingUserName + '" alt="' + votingUserName + '" />';
+      curhtml += '<img src="accurate-moderated.png" style="float: left" title="' + votingUserName + '" alt="' + votingUserName + '" />';
     }
     
-    curhtml += '<img src="http://<%= servername %>/transgame/check_22.png" style="float: left" title="Vote as accurate" alt="Vote as accurate" />';
-    curhtml += '<img src="http://<%= servername %>/transgame/smiley_22.png" style="float: left" title="Vote as funny" alt="Vote as funny" />';
+    curhtml += '<img src="check_22.png" style="float: left" title="Vote as accurate" alt="Vote as accurate" />';
+    curhtml += '<img src="smiley_22.png" style="float: left" title="Vote as funny" alt="Vote as funny" />';
     
     curhtml += translation + ' (<i>' + contributingUser + '</i>)</li>';
     byVotes[byVotes.length] = [votingUsers.length, curhtml];
@@ -693,7 +693,8 @@ alert(oRequest.responseText);
 
 
 //$('#userid_display').html(userid);
-$('#chatRegionContents').pad({'padId':'transgame-<%= gameidalphanumericsubs %>', 'height': '100%', 'width': '100%', 'userName': userid, 'showChat': true});
+$('#chatRegionContents').pad({'padId':'transgame-<%= gameidalphanumericsubs %>', 'host': 'http://transgame.csail.mit.edu:9001', 'height': '100%', 'width': '100%', 'userName': userid, 'showChat': true});
+//$('#chatRegionContents').pad({'padId':'transgame-<%= gameidalphanumericsubs %>', 'height': '100%', 'width': '100%', 'userName': userid, 'showChat': true});
 
 //$('#scoreBoardRegionContents').pad({'padId':'transgams-<%= gameidalphanumericsubs %>', 'height': '100%', 'userName': userid});
 docWidth = $(document).width();
@@ -790,7 +791,7 @@ collapseOrExpand($('#scoreBoardRegion'));
 <body id='mainBody'>
 
 <!--
-<iframe src="http://<%= servername %>:8080/proxy/<%= urlD %>" class='fullscreen' id='frameConts'>Your browser doesn't support iFrames.</iframe>
+<iframe src="proxy/<%= urlD %>" class='fullscreen' id='frameConts'>Your browser doesn't support iFrames.</iframe>
 
 
 
@@ -834,7 +835,7 @@ Translation: <input type='text' name='add_translation' id='add_translation' styl
 -->
 
 <div id="maincontent">
-<iframe src="http://<%= servername %>:8080/proxy/<%= urlD %>" class='fullscreen' id='frameConts'>Your browser doesn't support iFrames.</iframe>
+<iframe src="proxy/<%= urlD %>" class='fullscreen' id='frameConts'>Your browser doesn't support iFrames.</iframe>
 </div>
 
 <div id="topcontent">
@@ -845,7 +846,7 @@ Translation: <input type='text' name='add_translation' id='add_translation' styl
 <table width="100%" cellspacing="0" cellpadding="0">
 <tr>
 <td style="white-space: nowrap">
-<label for="text_to_be_translated_suggestion">Suggest sentence from article to translate: &nbsp</label>
+<label for="text_to_be_translated_suggestion">Suggest sentence from article to translate: &nbsp;</label>
 </td>
 <td width="100%">
 <input type='text' name='text_to_be_translated_suggestion' id='text_to_be_translated_suggestion' style="width: 100%; border: 0; margin: 0; padding: 0"></input>
@@ -859,14 +860,14 @@ Translation: <input type='text' name='add_translation' id='add_translation' styl
 
 <div id="voting-region"></div><br/>
 
-<div style="float: left">Sentence being translated: &nbsp</div><div name='text_being_translated' id='text_being_translated'></div>
+<div style="float: left">Sentence being translated: &nbsp;</div><div name='text_being_translated' id='text_being_translated'></div>
 
 <form action="" onsubmit='return submitNewTranslation()'>
 
 <table width="100%" cellspacing="0" cellpadding="0">
 <tr>
 <td style="white-space: nowrap">
-<label for="add_translation">Translation: </label>
+<label for="add_translation">Translation: &nbsp;</label>
 </td>
 <td width=100%>
 <input type='text' name='add_translation' id='add_translation' style="width: 100%; border: 0; margin: 0; padding: 0"></input>

@@ -45,9 +45,10 @@ var nowjs = require("now");
 
 var express = require('express')
 
-
-
 var $ = require('jQuery');
+
+var staticResource = require('./staticresource.js');
+var srhandler = staticResource.createHandler(fs.realpathSync('./static'));
 
 // local dependencies
 var blocklist = require('./blocklist');
@@ -96,6 +97,7 @@ var server = connect()
   		store: new RedisStore({client: redis}),
   		cookie: { path: '/', httpOnly: false, maxAge: null }
   	}))
+  //.use(connect.static(__dirname + '/static'))
 	.use(function(request, response){
 
 //var server = connect.createServer(function(request, response){
@@ -113,6 +115,9 @@ var server = connect()
       writeResponse(response, ejs.render(lobbyData))
     }
     return
+	}
+	if (srhandler.handle(url_data.path, request, response)) {
+	  return
 	}
 	if (request.url.indexOf('/?') == 0) {
     urlD = url_data.query['url']
@@ -899,6 +904,18 @@ everyone = nowjs.initialize(nowjsServer);
 console.log('nowjs server started on port 9000')
 
 client = redisO.createClient()
+
+/*
+etherpadapi = require('etherpad-lite-client')
+
+etherpadapikey = fs.readFileSync(path.join(__dirname,'.etherpadapikey.txt')).toString().trim()
+
+etherpad = api.connect({
+  apikey: etherpadapikey,
+  host: 'transgame.csail.mit.edu',
+  port: 9001,
+})
+*/
 
 Array.prototype.remove = function(elem) {
     var match = -1;

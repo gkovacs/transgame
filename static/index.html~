@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8">
+    <title>TransGame</title>
+  </head>
+<body>
+<script src="http://<%= servername %>:8080/jquery.min.js"></script>
+<script src="http://<%= servername %>:8080/jquery.cookie.js"></script>
+<script>
+function gotoPage() {
+userid = document.forms["frm1"]["userName"].value;
+if (userid == '') {
+alert('please enter a username');
+return false;
+}
+$.cookie('transgame_userid', userid, { expires: 7, path: '/' });
+window.location = 'http://transgame.csail.mit.edu:8080/lobby';
+return false;
+
+
+
+}
+
+userid = $.cookie('transgame_userid');
+if (userid != null) {
+window.location = 'http://transgame.csail.mit.edu:8080/lobby';
+}
+
+</script>
+<form name="frm1" action="" onsubmit="return gotoPage()">
+Your Username: <input type="text" name="userName" />
+<input type="submit" value="Enter Username" /><br/>
+</body>
+</html>
