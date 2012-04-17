@@ -576,6 +576,27 @@ function showOrHide(elem) {
   }
 }
 
+/** Copy selected text into suggestions input textbox */ 
+function copySelectedText() {
+  var txt = '';
+  var iframe = document.getElementById('frameConts');
+  if (window.getSelection) {
+    var iwindow = iframe.contentWindow || iframe.contentDocument.defaultView;
+    txt = ''+iwindow.getSelection();
+  }
+  else if (document.getSelection) {
+    var idocument = iframe.contentDocument || iframe.contentWindow.document;
+    txt = ''+idocument.getSelection();
+  }
+  else if (document.selection) {
+    var idocument = iframe.contentDocument || iframe.contentWindow.document;
+    txt = idocument.selection.createRange().text;
+  }
+  else return;
+  $('#text_to_be_translated_suggestion').val(txt);
+}
+
+
 function getFrameHTML() {
 return frames['frameConts'].document.body.innerHTML;
 }
@@ -785,6 +806,13 @@ collapseOrExpand($('#scoreBoardRegion'));
 //console.log("''' + gameid + '''");
 
 //$("#notificationContainer").notify();
+
+/** When user releases mouse over iframe, copy highlighted selection into textbox */
+$('#frameConts').load(function() {
+  $(document.getElementById('frameConts').contentWindow.document).mouseup(function(){
+    copySelectedText();
+  });
+});
 
 });
 </script>
