@@ -845,10 +845,10 @@ Translation: <input type='text' name='add_translation' id='add_translation' styl
 <table width="100%" cellspacing="0" cellpadding="0">
 <tr>
 <td style="white-space: nowrap">
-<label for="text_to_be_translated_suggestion">Suggest sentence from article to translate: </label>
+<label for="text_to_be_translated_suggestion">Suggest sentence from article to translate: &nbsp;</label>
 </td>
 <td width="100%">
-<input type='text' name='text_to_be_translated_suggestion' id='text_to_be_translated_suggestion' style="width: 100%;"></input>
+<input type='text' name='text_to_be_translated_suggestion' id='text_to_be_translated_suggestion' style="width: 100%; border: 0; margin: 0; padding: 0"></input>
 </td>
 </tr>
 </table>
@@ -857,19 +857,19 @@ Translation: <input type='text' name='add_translation' id='add_translation' styl
 
 <div id="translationRegionNoSuggestion" style="position: absolute; bottom: 5px; top: 40px; left: 0px; right: 0px; width: 100%">
 
-<div id="voting-region"></div>
+<div id="voting-region"></div><br/>
 
-Text Being Translated: <div name='text_being_translated' id='text_being_translated'></div>
+<div style="float: left">Sentence being translated: &nbsp;</div><div name='text_being_translated' id='text_being_translated'></div>
 
 <form action="" onsubmit='return submitNewTranslation()'>
 
 <table width="100%" cellspacing="0" cellpadding="0">
 <tr>
 <td style="white-space: nowrap">
-<label for="add_translation">Translation: </label>
+<label for="add_translation">Translation: &nbsp;</label>
 </td>
 <td width=100%>
-<input type='text' name='add_translation' id='add_translation' style="width: 100%;"></input>
+<input type='text' name='add_translation' id='add_translation' style="width: 100%; border: 0; margin: 0; padding: 0"></input>
 </td>
 </tr>
 </table>
