@@ -1,4 +1,7 @@
-var nowjsServer = express.createServer();
+var nowjs = require("now");
+var nowjsServer = require('http').createServer(function(req, res){
+  res.end('');
+});
 nowjsServer.listen(9000)
 everyone = nowjs.initialize(nowjsServer);
 console.log('nowjs server started on port 9000')

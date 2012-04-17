@@ -117,6 +117,7 @@ var server = connect()
     return
 	}
 	if (srhandler.handle(url_data.path, request, response)) {
+	  return
 	}
 	if (request.url.indexOf('/?') == 0) {
     urlD = url_data.query['url']

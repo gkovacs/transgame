@@ -64,7 +64,7 @@ $(document).ready(function(){
 
 $('#welcome').html('Welcome, ' + userid + '. Please pick an existing game to join, or enter a new URL for a webpage you would like to translate.');
 
-$('#chatRegionContents').pad({'padId':'transgame-lobby', 'height': '300px', 'width': '100%', 'userName': userid, 'showChat': true});
+$('#chatRegionContents').pad({'padId':'transgame-lobby', 'host': 'http://transgame.csail.mit.edu:9001', 'height': '300px', 'width': '100%', 'userName': userid, 'showChat': true});
 
 });
 

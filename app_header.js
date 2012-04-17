@@ -41,9 +41,9 @@ var fs = require('fs')
 
 var crypto = require('crypto');
 
-var nowjs = require("now");
 
-var express = require('express')
+
+//var express = require('express')
 
 var $ = require('jQuery');
 
@@ -69,7 +69,7 @@ if(config.redistogo_url) {
 
 var lobbyData = ''
 var indexData = ''
-var nowjsData = ''
+//var nowjsData = ''
 
 function silentConsoleLog(data) {
 

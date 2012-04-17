@@ -41,9 +41,9 @@ var fs = require('fs')
 
 var crypto = require('crypto');
 
-var nowjs = require("now");
 
-var express = require('express')
+
+//var express = require('express')
 
 var $ = require('jQuery');
 
@@ -69,7 +69,7 @@ if(config.redistogo_url) {
 
 var lobbyData = ''
 var indexData = ''
-var nowjsData = ''
+//var nowjsData = ''
 
 function silentConsoleLog(data) {
 
@@ -898,7 +898,10 @@ if (cluster.isMaster) {
 	});
 }
 
-var nowjsServer = express.createServer();
+var nowjs = require("now");
+var nowjsServer = require('http').createServer(function(req, res){
+  res.end('');
+});
 nowjsServer.listen(9000)
 everyone = nowjs.initialize(nowjsServer);
 console.log('nowjs server started on port 9000')

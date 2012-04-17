@@ -1,11 +1,13 @@
-var nowjsServer = express.createServer();
+var nowjsServer = require('http').createServer(function(req, res){
+  res.end('');
+});
 nowjsServer.listen(9000)
 everyone = nowjs.initialize(nowjsServer);
 console.log('nowjs server started on port 9000')
 
 client = redisO.createClient()
 
-
+/*
 etherpadapi = require('etherpad-lite-client')
 
 etherpadapikey = fs.readFileSync(path.join(__dirname,'.etherpadapikey.txt')).toString().trim()
@@ -15,7 +17,7 @@ etherpad = api.connect({
   host: 'transgame.csail.mit.edu',
   port: 9001,
 })
-
+*/
 
 Array.prototype.remove = function(elem) {
     var match = -1;
