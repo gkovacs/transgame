@@ -381,7 +381,13 @@ now.url = '<%= urlD %>'
 gameid = '<%= urlD %>'
 
 now.updateTime = function(time){
-  $("#timeDisplay").html(time);
+  var prevTime = $("#timeDisplay").text()
+  $("#timeDisplay").text(time);
+  if (time == '0' && prevTime != '0') {
+    endOfRound()
+  } else if (time != '0' && prevTime == '0') {
+    startOfRound()
+  }
 }
 
 now.sendNewScores = function(userScores, userList) {
@@ -400,9 +406,9 @@ prevVotingRegionHTML = '';
 now.setTextToBeTranslated = function(text, userSuggestingText) {
   $.gritter.removeAll()
   $("#translationRegionNoSuggestion").show()
-  if (text == $('#text_to_be_translated_suggestion').val()) {
+  if (text == $('#text_to_be_translated_suggestion').text()) {
     now.suggestNewTextToBeTranslated('', userid);
-    $('#text_to_be_translated_suggestion').val('');
+    setTextInSuggestionBox('');
   }
   setTextBeingTranslated(text, userSuggestingText)
   clearVoting();
@@ -414,10 +420,14 @@ $.gritter.add({
 	// (string | mandatory) the heading of the notification
 	title: 'Select a sentence to translate',
 	// (string | mandatory) the text inside the notification
-	text: 'Paste a sentence from the article into "Suggest sentence from article to translate"',
+	text: 'Highlight a sentence from the article that you want to translate.',
 	sticky: true,
 });
 }
+
+$('#suggestTextLabel').text('Highlight a sentence from the article that you want to translate.')
+$('#textSuggestionRegion').show()
+
 $("#translationRegionNoSuggestion").hide(600)
 }
 
@@ -457,7 +467,7 @@ return false;
 function submitNewTextBeingTranslated() {
 //clearVoting();
 //console.log('submitting new text to be translated');
-var text = $('#text_to_be_translated_suggestion').val();
+var text = $('#text_to_be_translated_suggestion').text();
 
 now.suggestNewTextToBeTranslated(text, userid);
 //clearVoting();
@@ -509,7 +519,7 @@ console.log(data);
 timeleft = parseInt(data)
 timeleft += Math.round(0.1*textBeingTranslated.length);
 data = timeleft.toString();
-$('#timeDisplay').html(data);
+$('#timeDisplay').text(data);
 });
 
 }
@@ -576,6 +586,30 @@ function showOrHide(elem) {
   }
 }
 
+function endOfRound() {
+  
+}
+
+function startOfRound() {
+  if ($('#text_to_be_translated_suggestion').text() == '') {
+    $('#textSuggestionRegion').hide()
+  }
+}
+
+function isRoundOver() {
+  return $('#timeDisplay').text() == '0'
+}
+
+function setTextInSuggestionBox(txt) {
+$('#text_to_be_translated_suggestion').text(txt);
+if (txt == '') {
+$('#suggestTextLabel').text('Highlight a sentence from the article that you want to translate.')
+} else {
+$('#suggestTextLabel').text('Sentence I suggested to be translated during the next round: ')
+$('#textSuggestionRegion').show()
+}
+}
+
 /** Copy selected text into suggestions input textbox */ 
 function copySelectedText() {
   var txt = '';
@@ -593,7 +627,10 @@ function copySelectedText() {
     txt = idocument.selection.createRange().text;
   }
   else return;
-  $('#text_to_be_translated_suggestion').val(txt);
+  if (txt == '')
+    return
+  setTextInSuggestionBox(txt);
+  submitNewTextBeingTranslated()
 }
 
 
@@ -714,8 +751,8 @@ alert(oRequest.responseText);
 
 
 //$('#userid_display').html(userid);
-//$('#chatRegionContents').pad({'padId':'transgame-<%= gameidalphanumericsubs %>', 'host': 'http://transgame.csail.mit.edu:9001', 'height': '100%', 'width': '100%', 'userName': userid, 'showChat': true});
-$('#chatRegionContents').pad({'padId':'transgame-<%= gameidalphanumericsubs %>', 'height': '100%', 'width': '100%', 'userName': userid, 'showChat': true});
+$('#chatRegionContents').pad({'padId':'transgame-<%= gameidalphanumericsubs %>', 'host': 'http://transgame.csail.mit.edu:9001', 'height': '100%', 'width': '100%', 'userName': userid, 'showChat': true});
+//$('#chatRegionContents').pad({'padId':'transgame-<%= gameidalphanumericsubs %>', 'height': '100%', 'width': '100%', 'userName': userid, 'showChat': true});
 
 //$('#scoreBoardRegionContents').pad({'padId':'transgams-<%= gameidalphanumericsubs %>', 'height': '100%', 'userName': userid});
 docWidth = $(document).width();
@@ -869,12 +906,13 @@ Translation: <input type='text' name='add_translation' id='add_translation' styl
 <div id="topcontent">
 
 <div id="translateRegionContents" style="width: 100%">
+<!--
 <form action="" onsubmit='return submitNewTextBeingTranslated()'>
 
 <table width="100%" cellspacing="0" cellpadding="0">
 <tr>
 <td style="white-space: nowrap">
-<label for="text_to_be_translated_suggestion">Suggest sentence from article to translate: &nbsp;</label>
+<label for="text_to_be_translated_suggestion" id='suggestTextLabel'>Suggest sentence from article to translate: &nbsp;</label>
 </td>
 <td width="100%">
 <input type='text' name='text_to_be_translated_suggestion' id='text_to_be_translated_suggestion' style="width: 100%; border: 0; margin: 0; padding: 0"></input>
@@ -883,8 +921,11 @@ Translation: <input type='text' name='add_translation' id='add_translation' styl
 </table>
 
 </form>
+-->
+<div id='textSuggestionRegion'>
+<div id='suggestTextLabel' style="float: left">Highlight a sentence from the article that you want to translate.</div><div style="float: left">&nbsp;</div><div id='text_to_be_translated_suggestion' style="float: left"></div><br/><br/></div>
 
-<div id="translationRegionNoSuggestion" style="position: absolute; bottom: 5px; top: 40px; left: 0px; right: 0px; width: 100%">
+<div id="translationRegionNoSuggestion" style="width: 100%">
 
 <div id="voting-region"></div><br/>
 
@@ -900,6 +941,9 @@ Translation: <input type='text' name='add_translation' id='add_translation' styl
 <td width=100%>
 <input type='text' name='add_translation' id='add_translation' style="width: 100%; border: 0; margin: 0; padding: 0"></input>
 </td>
+<td style="white-space: nowrap">
+<input type="submit" value="Submit Translation"></input>
+</td>
 </tr>
 </table>
 
@@ -911,7 +955,7 @@ Translation: <input type='text' name='add_translation' id='add_translation' styl
 </div>
 
 <div id="framecontent">
-<div style="text-align: center">Round ends in:</div><div id="timeDisplayContainer" style="text-align: center;" ><div id="timeDisplay" style="font-size: 26px; display: inline">0</div><div style="display: inline;">  seconds</div></div><br/>
+<div style="text-align: center;" >Round ends in:</div><div id="timeDisplayContainer" style="text-align: center;" ><div id="timeDisplay" style="font-size: 26px; display: inline">0</div><div style="display: inline;"> seconds</div></div><br/>
 Scoreboard:
 <div id="scoreBoardRegionContents" ></div>
 </div>
