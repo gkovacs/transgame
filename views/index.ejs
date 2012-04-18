@@ -384,6 +384,9 @@ gameid = '<%= urlD %>'
 now.updateTime = function(time){
   var prevTime = $("#timeDisplay").text()
   $("#timeDisplay").text(time);
+  if (time != '0') {
+    $("#roundTimerDisplay").css("visibility", "visible")
+  }
   if (time == '0' && prevTime != '0') {
     endOfRound()
   } else if (time != '0' && prevTime == '0') {
@@ -405,7 +408,8 @@ textBeingTranslated = '';
 prevVotingRegionHTML = '';
 
 now.setTextToBeTranslated = function(text, userSuggestingText) {
-  $.gritter.removeAll()
+  //$.gritter.removeAll()
+  $("#roundTimerDisplay").css("visibility", "visible")
   $("#translationRegionNoSuggestion").show()
   if (text == $('#text_to_be_translated_suggestion').text()) {
     now.suggestNewTextToBeTranslated('', userid);
@@ -416,6 +420,7 @@ now.setTextToBeTranslated = function(text, userSuggestingText) {
 }
 
 now.askForTextSuggestions = function() {
+/*
 if ($('.gritter-item').length == 0) {
 $.gritter.add({
 	// (string | mandatory) the heading of the notification
@@ -425,11 +430,13 @@ $.gritter.add({
 	sticky: true,
 });
 }
+*/
 
 $('#suggestTextLabel').text('Highlight a sentence from the article that you want to translate.')
 $('#textSuggestionRegion').show()
 
 $("#translationRegionNoSuggestion").hide(600)
+$("#roundTimerDisplay").css("visibility", "hidden")
 }
 
 now.quitUser = function(quserid, qgameid) {
@@ -956,8 +963,8 @@ Translation: <input type='text' name='add_translation' id='add_translation' styl
 </div>
 
 <div id="framecontent">
-<div style="text-align: center;" >Round ends in:</div><div id="timeDisplayContainer" style="text-align: center;" ><div id="timeDisplay" style="font-size: 26px; display: inline">0</div><div style="display: inline;"> seconds</div></div><br/>
-Scoreboard:
+<div id="roundTimerDisplay" style="visibility: hidden"><div style="text-align: center;" >Round ends in:</div><div id="timeDisplayContainer" style="text-align: center;" ><div id="timeDisplay" style="font-size: 26px; display: inline">0</div><div style="display: inline;"> seconds</div></div></div><br/>
+<b>Scoreboard:</b>
 <div id="scoreBoardRegionContents" ></div>
 </div>
 
