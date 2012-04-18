@@ -92,20 +92,20 @@ function writeResponseJS(response, data) {
 }
 
 var server = connect()
-	.use(connect.cookieParser(config.secret))
-  	.use(connect.session({
+  	server.use(connect.cookieParser(config.secret))
+  	server.use(connect.session({
   		store: new RedisStore({client: redis}),
   		cookie: { path: '/', httpOnly: false, maxAge: null }
   	}))
-  //.use(connect.static(__dirname + '/static'))
-	.use(function(request, response){
+	server.use('/static', connect.static(__dirname + '/static'))
+	server.use(function(request, response){
 
 //var server = connect.createServer(function(request, response){
 	var url_data = url.parse(request.url, true);
 
 	// only requests that start with this get proxied - the rest get 
 	// redirected to either a url that matches this or the home page
-	if (request.url.indexOf('/lobby') == 0 || request.url.indexOf('/lobby/') == 0) {
+	if (request.url.indexOf('/lobby') == 0) {
     if (lobbyData == '') {
       fs.readFile('views/lobby.ejs', function(err, data) {
         lobbyData = data.toString()
@@ -609,7 +609,7 @@ function redirectTo(request, response, site){
 	if(site == "/") site = ""; // no endless redirect loops
 	try {
 		response.writeHead('302', {'Location': thisSite(request) + site});
-		silentConsoleLog("recirecting to " + thisSite(request) + site);
+		silentConsoleLog("redirecting to " + thisSite(request) + site);
 	} catch(ex) {
 		// the headers were already sent - we can't redirect them
 		console.error("Failed to send redirect", ex);
