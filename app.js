@@ -97,7 +97,6 @@ var server = connect()
   		store: new RedisStore({client: redis}),
   		cookie: { path: '/', httpOnly: false, maxAge: null }
   	}))
-	server.use('/static', connect.static(__dirname + '/static'))
 	server.use(function(request, response){
 
 //var server = connect.createServer(function(request, response){
