@@ -71,7 +71,7 @@ gameList = []
 gameToUsers = {}
 
 var gameDuration = 30;
-var useridToUser = {}
+//var useridToUser = {}
 
 everyone.now.sendGameListCallback = function(callback) {
   callback(gameToUsers, gameList)
@@ -223,7 +223,7 @@ nowjs.on("connect", function(){
   var userid = this.now.userid
   var url = this.now.url
   //everyone.now.quitUser(userid, url)
-  useridToUser[userid] = this
+  //useridToUser[userid] = this
   if (url != null) {
     if ($.inArray(url, gameList) == -1) {
       gameList.push(url)
@@ -236,7 +236,7 @@ nowjs.on("connect", function(){
     nowjs.getGroup(url).addUser(this.user.clientId)
     this.now.groupAddingFinished()
     nowjs.getGroup(url).now.sendUserTranslations(translationToUserList, translationsByOrderSubmitted)
-    everyone.now.sendGameList(gameToUsers, gameList)
+    //everyone.now.sendGameList(gameToUsers, gameList)
   }
   
   userScores[userid] = 0
