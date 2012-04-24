@@ -312,7 +312,7 @@ right: 0;
 width: 250px; /*Width of frame div*/
 height: 40%;
 overflow: hidden; /*Disable scrollbars. Set to "scroll" to enable*/
-background: navy;
+background: green;
 color: white;
 }
 
@@ -470,6 +470,39 @@ sendTranslation(translation);
 
 $('#add_translation').val('')
 return false;
+}
+
+function sendChatMessage() {
+var text = $('#chat_message').val();
+now.sendChatMessage(text, userid);
+return false;
+}
+
+now.receiveTimeWarning = function(text) {
+receiveSystemMessage('10 seconds until round ends!')
+if ($('#text_to_be_translated_suggestion').text() == '') {
+receiveSystemMessage('Select a sentence to be translated during the next round')
+}
+}
+
+function receiveSystemMessage(text) {
+var newSpan = $('<span>').append($('<i>').text(text))
+$('#chatRegionContents').append(newSpan)
+$('#chatRegionContents').append('<br/>')
+}
+
+function receiveSystemMessageBold(text) {
+var newSpan = $('<span>').append($('<i>').append($('<b>').text(text)))
+$('#chatRegionContents').append(newSpan)
+$('#chatRegionContents').append('<br/>')
+}
+
+now.receiveSystemMessage = receiveSystemMessage
+
+now.receiveChatMessage = function(text, userid) {
+var newSpan = $('<span>').append($('<b>').text(userid + ': ')).append($('<span>').text(text))
+$('#chatRegionContents').append(newSpan)
+$('#chatRegionContents').append('<br/>')
 }
 
 function submitNewTextBeingTranslated() {
@@ -726,14 +759,19 @@ function collapseOrExpand(elem) {
   }
 }
 
+function htmlEscape(text) {
+return $('<div>').text(text).html()
+}
+
 function setTextBeingTranslated(text, userSuggestingText) {
   textBeingTranslated = text;
   if (text == '') {
     $('#text_being_translated').html('')
   } else {
-    $('#text_being_translated').html('<b>' + textBeingTranslated + '</b>' + ' <i>(suggested by ' + userSuggestingText + ')</i>');
-  highlightFrameText(text)
-  console.log('set text being translated to ' + text)
+    receiveSystemMessageBold('Now Translating: ' + textBeingTranslated)
+    $('#text_being_translated').html('<b>' + htmlEscape(textBeingTranslated) + '</b>' + ' <i>(suggested by ' + userSuggestingText + ')</i>');
+    highlightFrameText(text)
+    console.log('set text being translated to ' + text)
   }
 }
 
@@ -759,7 +797,7 @@ alert(oRequest.responseText);
 
 
 //$('#userid_display').html(userid);
-$('#chatRegionContents').pad({'padId':'transgame-<%= gameidalphanumericsubs %>', 'host': 'http://transgame.csail.mit.edu:9001', 'height': '100%', 'width': '100%', 'userName': userid, 'showChat': false});
+//$('#chatRegionContents').pad({'padId':'transgame-<%= gameidalphanumericsubs %>', 'host': 'http://transgame.csail.mit.edu:9001', 'height': '100%', 'width': '100%', 'userName': userid, 'showChat': false});
 //$('#chatRegionContents').pad({'padId':'transgame-<%= gameidalphanumericsubs %>', 'height': '100%', 'width': '100%', 'userName': userid, 'showChat': true});
 
 //$('#scoreBoardRegionContents').pad({'padId':'transgams-<%= gameidalphanumericsubs %>', 'height': '100%', 'userName': userid});
@@ -969,7 +1007,24 @@ Translation: <input type='text' name='add_translation' id='add_translation' styl
 </div>
 
 <div id="chatregionframe">
-<div id="chatRegionContents" style="height: 100%"></div>
+<b>Chat:</b>
+<table height="100%" cellspacing="0" cellpadding="0">
+<tr height="100%">
+
+<div id="chatRegionContents">
+
+</div>
+
+</tr>
+<tr>
+
+<form action="" onsubmit='return sendChatMessage()'>
+<input type='text' name='chat_message' id='chat_message' style="width: 100%; border: 0; margin: 0; padding: 0"></input>
+</form>
+
+</tr>
+</table>
+
 </div>
 
 </body>

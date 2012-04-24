@@ -106,7 +106,9 @@ function getBestTranslation() {
 var curtime = 0
 setInterval(function() {
 //var curtime = Math.round((new Date()).getTime() / 1000);
-if (curtime == 0) {
+if (curtime == 10) {
+  nowjs.getGroup(gameid).now.receiveTimeWarning()
+} if (curtime == 0) {
   var users = dictKeys(userToSuggestedText);
   if (users.length == 0) {
     nowjs.getGroup(gameid).now.askForTextSuggestions()
@@ -217,6 +219,13 @@ nowjs.getGroup(gameid).now.suggestNewTextToBeTranslated = function(text, userid)
   }
 }
 
+nowjs.getGroup(gameid).now.sendChatMessage = function(text, userid) {
+  if (text == '') {
+    return
+  }
+  nowjs.getGroup(gameid).now.receiveChatMessage(text, userid)
+}
+
 }
 
 nowjs.on("connect", function(){
@@ -249,7 +258,7 @@ nowjs.on("connect", function(){
 
 function disconnect(userid, url) {
   gameToUsers[url].remove(userid)
-  everyone.now.sendGameList(gameToUsers, gameList)
+  //everyone.now.sendGameList(gameToUsers, gameList)
   
   userList.remove(userid)
   //userScores[userid] = 0
