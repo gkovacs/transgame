@@ -300,7 +300,8 @@ top: 0;
 left: 0;
 width: 250px; /*Width of frame div*/
 height: 40%;
-overflow: auto; /*Disable scrollbars. Set to "scroll" to enable*/
+overflow-x: hidden; /*Disable scrollbars. Set to "scroll" to enable*/
+overflow-y: auto;
 background: green;
 color: white;
 }
@@ -311,7 +312,8 @@ top: 0;
 right: 0;
 width: 250px; /*Width of frame div*/
 height: 40%;
-overflow: hidden; /*Disable scrollbars. Set to "scroll" to enable*/
+overflow-x: hidden; /*Disable scrollbars. Set to "scroll" to enable*/
+overflow-y: auto;
 background: green;
 color: white;
 }
@@ -481,28 +483,36 @@ return false;
 now.receiveTimeWarning = function(text) {
 receiveSystemMessage('10 seconds until round ends!')
 if ($('#text_to_be_translated_suggestion').text() == '') {
-receiveSystemMessage('Select a sentence to be translated during the next round')
+receiveSystemMessage('Highlight a sentence from the article to be translated during the next round.')
 }
+}
+
+function scrollChatToBottom() {
+$('#chatregionframe').scrollTop($('#chatregionframe')[0].scrollHeight)
+}
+
+function scrollTransRegionToBottom() {
+$('#topcontent').scrollTop($('#topcontent')[0].scrollHeight)
 }
 
 function receiveSystemMessage(text) {
-var newSpan = $('<span>').append($('<i>').text(text))
+var newSpan = '<i>' + htmlEscape(text) + '</i><br/>'
 $('#chatRegionContents').append(newSpan)
-$('#chatRegionContents').append('<br/>')
+scrollChatToBottom()
 }
 
 function receiveSystemMessageBold(text) {
-var newSpan = $('<span>').append($('<i>').append($('<b>').text(text)))
+var newSpan = '<b><u>' + htmlEscape(text) + '</u></b><br/>'
 $('#chatRegionContents').append(newSpan)
-$('#chatRegionContents').append('<br/>')
+scrollChatToBottom()
 }
 
 now.receiveSystemMessage = receiveSystemMessage
 
 now.receiveChatMessage = function(text, userid) {
-var newSpan = $('<span>').append($('<b>').text(userid + ': ')).append($('<span>').text(text))
+var newSpan = '<b>' + userid + '</b>: ' + htmlEscape(text) + '<br/>'
 $('#chatRegionContents').append(newSpan)
-$('#chatRegionContents').append('<br/>')
+scrollChatToBottom()
 }
 
 function submitNewTextBeingTranslated() {
@@ -968,8 +978,6 @@ Translation: <input type='text' name='add_translation' id='add_translation' styl
 
 </form>
 -->
-<div id='textSuggestionRegion'>
-<div id='suggestTextLabel' style="float: left">Highlight a sentence from the article that you want to translate.</div><div style="float: left">&nbsp;</div><div id='text_to_be_translated_suggestion' style="float: left"></div><br/><br/></div>
 
 <div id="translationRegionNoSuggestion" style="width: 100%">
 
@@ -996,6 +1004,9 @@ Translation: <input type='text' name='add_translation' id='add_translation' styl
 </form>
 </div>
 
+<div id='textSuggestionRegion'>
+<div id='suggestTextLabel' style="float: left">Highlight a sentence from the article that you want to translate.</div><div style="float: left">&nbsp;</div><div id='text_to_be_translated_suggestion' style="float: left"></div><br/><br/></div>
+
 </div>
 
 </div>
@@ -1008,22 +1019,14 @@ Translation: <input type='text' name='add_translation' id='add_translation' styl
 
 <div id="chatregionframe">
 <b>Chat:</b>
-<table height="100%" cellspacing="0" cellpadding="0">
-<tr height="100%">
 
 <div id="chatRegionContents">
 
 </div>
 
-</tr>
-<tr>
-
 <form action="" onsubmit='return sendChatMessage()'>
 <input type='text' name='chat_message' id='chat_message' style="width: 100%; border: 0; margin: 0; padding: 0"></input>
 </form>
-
-</tr>
-</table>
 
 </div>
 
