@@ -493,6 +493,7 @@ return false;
 
 function sendChatMessage() {
 var text = $('#chat_message').val();
+$('#chat_message').val('');
 now.sendChatMessage(text, userid);
 return false;
 }
@@ -500,12 +501,10 @@ return false;
 now.receiveTimeWarning = function(text) {
 //receiveSystemMessage('10 seconds until round ends!')
 if (translationVotedFor == '') {
-receiveSystemMessage('10 seconds until round ends!')
-receiveSystemMessage('Submit a translation, or vote for one by clicking on it.')
+receiveSystemMessageAppending("<i>10 seconds until round ends, and you still haven't voted.</i>", " <i>You can vote for a translation by clicking on one, or submit your own translation.</i>")
 }
 else if ($('#text_to_be_translated_suggestion').text() == '') {
-receiveSystemMessage('10 seconds until round ends!')
-highlightSentenceNotice()
+receiveSystemMessageAppending("<i>10 seconds until round ends, and you still haven't suggested a sentence.</i>", " <i>You can suggest a sentence to be translated during the next round by highlighting/selecting it in the article text below. If multiple people suggest sentences, one will be picked randomly.</i>")
 }
 }
 
@@ -545,26 +544,27 @@ function replaceMessageEscaped(extMsgId, exthtmlescaped) {
 replaceMessage(extMsgId, unescape(exthtmlescaped))
 }
 
-function expandableHtml(shorthtml, exthtml) {
-return shorthtml + ' <a href="javascript:void(0)" style="background-color: #FFE96B" onclick="replaceMessageEscaped(' + extMsgId + ', \'' + escape(exthtml) + '\')">show more</a>'
-}
-
-function expandableHtml(args) {
+function expandableHtml(args, expandtxt) {
 if (args.length == 0) return ''
 if (args.length == 1) return args[0]
+if (expandtxt == null) expandtxt = 'more info'
 args.reverse()
 var prevExp = args[0]
 for (var i = 1; i < args.length; ++i) {
-prevExp = args[i] + ' <a href="javascript:void(0)" style="background-color: #FFE96B" onclick="replaceMessageEscaped(' + extMsgId + ', \'' + escape(prevExp) + '\')">show more</a>'
+prevExp = args[i] + ' <a href="javascript:void(0)" style="background-color: #FFE96B" onclick="replaceMessageEscaped(' + extMsgId + ', \'' + escape(prevExp) + '\')">' + expandtxt + '</a>'
 }
 return prevExp
 }
 
 extMsgId = 0
 
-function receiveSystemMessageExtendedArray(args) {
+function makeExtendableSpan(args, expandtxt) {
 extMsgId += 1
-var newSpan = '<span id="extMsg' + extMsgId + '">' + expandableHtml(args) + '</span><br/>'
+return '<span id="extMsg' + extMsgId + '">' + expandableHtml(args, expandtxt) + '</span><br/>'
+}
+
+function receiveSystemMessageExtendedArray(args, expandtxt) {
+var newSpan = makeExtendableSpan(args, expandtxt)
 $('#chatRegionContents').append(newSpan)
 scrollChatToBottom()
 }
@@ -592,7 +592,12 @@ receiveSystemMessageExtendedArray(nargs)
 }
 
 now.receiveChatMessage = function(text, userid) {
-var newSpan = '<b>' + userid + '</b>: ' + htmlEscape(text) + '<br/>'
+var newSpan = ''
+if (text.length > 70) {
+newSpan = makeExtendableSpan(['<b>' + userid + '</b>:' + htmlEscape(text.slice(0,60)), '<b>' + userid + '</b>:' + htmlEscape(text)], 'more')
+} else {
+newSpan = '<b>' + userid + '</b>: ' + htmlEscape(text) + '<br/>'
+}
 $('#chatRegionContents').append(newSpan)
 scrollChatToBottom()
 }
@@ -661,7 +666,7 @@ $('#timeDisplay').text(data);
 
 now.welcomeUser = function(nuserid) {
   if (nuserid == userid) {
-    receiveSystemMessageAppending("Welcome to TransGame, the competitve translation game!", "<br/>Highlight a sentence from the article to start a new round. In each round, you and other players submit translations and vote on the best one, until the timer reaches 0.", "<br/>Scoring: 1 point for voting for someone else's translation, 2 points for each other player who votes for your translation.", "<br/>You can chat with other players in this area by typing a message in the box below and pressing enter.")
+    receiveSystemMessageAppending("Welcome to <i>TransGame</i>, the competitve translation game!", "<br/><b>Playing</b>: Highlight a sentence from the article to start a new round. In each round, you and other players submit translations and vote on the best one, until the timer reaches 0.", "<br/><b>Scoring</b>: 1 point for voting for someone else's translation, 2 points for each other player who votes for your translation.", "<br/><b>Chatting</b>: You can chat with other players in this area by typing a message in the box below and pressing enter.")
   } else {
     receiveSystemMessage(nuserid + ' joined the game')
   }
