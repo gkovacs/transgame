@@ -425,6 +425,10 @@ textBeingTranslated = '';
 prevVotingRegionHTML = '';
 translationVotedFor = '';
 
+numSwitchesToChat = 0
+numSwitchesToTrans = 0
+lastInputWasChat = false
+
 now.setTextToBeTranslated = function(text, userSuggestingText) {
   //$.gritter.removeAll()
   translationVotedFor = ''
@@ -485,15 +489,51 @@ function submitNewTranslation() {
 translation = $('#add_translation').val();
 //console.log(translation);
 
-sendTranslation(translation);
-
 $('#add_translation').val('')
+
+if (translation.indexOf('@c ') == 0 || translation.indexOf('@C ') == 0) {
+translation = translation.slice(2).trim()
+now.sendChatMessage(translation, userid)
+return false
+}
+else if (translation.indexOf('@t ') == 0 || translation.indexOf('@T ') == 0) {
+translation = translation.slice(2).trim()
+}
+else if (lastInputWasChat) {
+numSwitchesToTrans += 1
+if (numSwitchesToTrans % 10 == 7) {
+showAvoidSwitchingToTransHint()
+}
+}
+
+lastInputWasChat = false
+
+sendTranslation(translation);
 return false;
 }
 
 function sendChatMessage() {
+
 var text = $('#chat_message').val();
 $('#chat_message').val('');
+
+if (text.indexOf('@t ') == 0 || text.indexOf('@T ') == 0) {
+text = text.slice(2).trim()
+sendTranslation(text)
+return false
+}
+else if (text.indexOf('@c ') == 0 || text.indexOf('@C ') == 0) {
+text = text.slice(2).trim()
+}
+else if (!lastInputWasChat) {
+numSwitchesToChat += 1
+if (numSwitchesToChat % 10 == 2) {
+showAvoidSwitchingToChatHint()
+}
+}
+
+lastInputWasChat = true
+
 now.sendChatMessage(text, userid);
 return false;
 }
@@ -501,10 +541,10 @@ return false;
 now.receiveTimeWarning = function(text) {
 //receiveSystemMessage('10 seconds until round ends!')
 if (translationVotedFor == '') {
-receiveSystemMessageAppending("<i>10 seconds until round ends, and you still haven't voted.</i>", " <i>You can vote for a translation by clicking on one, or submit your own translation.</i>")
+receiveSystemMessageAppending("<i>10 seconds until round ends, you haven't voted yet.</i>", " <i>You can vote for a translation by clicking on one, or submit your own translation.</i>")
 }
 else if ($('#text_to_be_translated_suggestion').text() == '') {
-receiveSystemMessageAppending("<i>10 seconds until round ends, and you still haven't suggested a sentence.</i>", " <i>You can suggest a sentence to be translated during the next round by highlighting/selecting it in the article text below. If multiple people suggest sentences, one will be picked randomly.</i>")
+receiveSystemMessageAppending("<i>10 seconds until round ends, you haven't suggested a sentence yet.</i>", " <i>You can suggest a sentence to be translated during the next round by highlighting/selecting it in the article text below. If multiple people suggest sentences, one will be picked randomly.</i>")
 }
 }
 
@@ -589,6 +629,14 @@ for (var i = 1; i < args.length; ++i) {
 nargs[i] = nargs[i-1] + args[i]
 }
 receiveSystemMessageExtendedArray(nargs)
+}
+
+function showAvoidSwitchingToTransHint() {
+receiveSystemMessageAppending('Tip: you can submit translations from the chat box by prefixing with @t', '<br/>Similarly, you can chat from the translation box by prefixing with @c<br/>Examples:<br/>@t My translation<br/>@c Lol')
+}
+
+function showAvoidSwitchingToChatHint() {
+receiveSystemMessageAppending('Tip: you can chat from the translation box by prefixing with @c', '<br/>Similarly, you can submit translations from the chat box by prefixing with @t<br/>Examples:<br/>@c Lol<br/>@t My translation')
 }
 
 now.receiveChatMessage = function(text, userid) {

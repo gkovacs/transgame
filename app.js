@@ -1125,6 +1125,7 @@ nowjs.getGroup(gameid).now.sendTextBeingTranslatedToCallback = function(callback
 }
 
 nowjs.getGroup(gameid).now.submitTranslation = function(text, userid) {
+  if (textBeingTranslated == '') return
   var prevTranslation = userToTranslation[userid]
   if (prevTranslation == text) {
     // no change in translation
