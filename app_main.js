@@ -64,9 +64,6 @@ function dictKeys(dic)
   return keys;
 }
 
-userScores = {}
-userList = []
-
 gameList = []
 gameToUsers = {}
 
@@ -77,6 +74,9 @@ everyone.now.sendGameListCallback = function(callback) {
   callback(gameToUsers, gameList)
 }
 
+gameIdToUserConnect = {}
+gameIdToUserDisconnect = {}
+
 function initializeNewGame(gameid) {
 
 userToSuggestedText = {}
@@ -86,6 +86,27 @@ contributingUser = ''
 translationsByOrderSubmitted = []
 userToTranslation = {}
 translationToUserList = {}
+
+userScores = {}
+userList = []
+
+gameIdToUserConnect[gameid] = function(userid) {
+  if (userScores[userid] == null)
+    userScores[userid] = 0
+  if ($.inArray(userid, userList) == -1) {
+    userList.push(userid)
+  }
+  nowjs.getGroup(gameid).now.sendNewScores(userScores, userList)
+  //everyone.now.sendNewScores(userScores, userList)
+  console.log('connected ' + userid)
+}
+
+gameIdToUserDisconnect[gameid] = function(userid) {
+  userList.remove(userid)
+  userScores[userid] = 0
+  nowjs.getGroup(gameid).now.sendNewScores(userScores, userList)
+  console.log('disconnected ' + userid)
+}
 
 function getBestTranslation() {
   var bestTranslation = ''
@@ -103,19 +124,18 @@ function getBestTranslation() {
   return bestTranslation
 }
 
+isRoundActive = true
+secondsRoundInactive = 0
 var curtime = 0
 setInterval(function() {
 //var curtime = Math.round((new Date()).getTime() / 1000);
-if (curtime == 10) {
+if (curtime == 11) {
   nowjs.getGroup(gameid).now.receiveTimeWarning()
-} if (curtime == 0) {
-  var users = dictKeys(userToSuggestedText);
-  if (users.length == 0) {
-    nowjs.getGroup(gameid).now.askForTextSuggestions()
-    return;
-  }
-  console.log(users)
-  if (textBeingTranslated != '') {
+}
+
+if (curtime == 0) {
+
+  if (isRoundActive && textBeingTranslated != '') {
   // store translated stuff for persistence
   console.log('storing stuff for persistence')
   client.set(gameid + '|' + textBeingTranslated, JSON.stringify({'translationToUserList': translationToUserList, 'translationsByOrderSubmitted': translationsByOrderSubmitted, 'userToTranslation': userToTranslation}))
@@ -124,6 +144,22 @@ if (curtime == 10) {
   nowjs.getGroup(gameid).now.sendFinalTranslation(textBeingTranslated, bestTranslation)
   updateScores()
   }
+
+  var users = dictKeys(userToSuggestedText);
+  if (users.length == 0) {
+    nowjs.getGroup(gameid).now.askForTextSuggestions()
+    isRoundActive = false
+    if (secondsRoundInactive == 10) {
+      nowjs.getGroup(gameid).now.highlightSentenceNotice()
+    }
+    if (secondsRoundInactive <= 10) {
+      secondsRoundInactive += 1
+    }
+    return;
+  }
+  isRoundActive = true
+  secondsRoundInactive = 0
+  console.log(users)
   
   var selectedUserIdx = [Math.floor(Math.random()*users.length)];
   contributingUser = users[selectedUserIdx];
@@ -177,12 +213,14 @@ function updateScores() {
       userScores[voter] += 1
     }
   })
-  everyone.now.sendNewScores(userScores, userList)
+  nowjs.getGroup(gameid).now.sendNewScores(userScores, userList)
 }
 
 
 nowjs.getGroup(gameid).now.sendTextBeingTranslatedToCallback = function(callback) {
-  callback(textBeingTranslated, contributingUser);
+  if (isRoundActive) {
+    callback(textBeingTranslated, contributingUser);
+  }
 }
 
 nowjs.getGroup(gameid).now.submitTranslation = function(text, userid) {
@@ -245,24 +283,21 @@ nowjs.on("connect", function(){
     nowjs.getGroup(url).addUser(this.user.clientId)
     this.now.groupAddingFinished()
     nowjs.getGroup(url).now.sendUserTranslations(translationToUserList, translationsByOrderSubmitted)
+    gameIdToUserConnect[url](userid)
     //everyone.now.sendGameList(gameToUsers, gameList)
   }
-  
-  userScores[userid] = 0
-  if ($.inArray(userid, userList) == -1) {
-    userList.push(userid)
-  }
-  everyone.now.sendNewScores(userScores, userList)
-  console.log('connected ' + userid)
 });
 
 function disconnect(userid, url) {
+  gameIdToUserDisconnect[url](userid)
   gameToUsers[url].remove(userid)
   //everyone.now.sendGameList(gameToUsers, gameList)
   
-  userList.remove(userid)
+  //userList.remove(userid)
   //userScores[userid] = 0
-  everyone.now.sendNewScores(userScores, userList)
+  
+  //everyone.now.sendNewScores(userScores, userList)
+  
   console.log('disconnected ' + userid)
 }
 

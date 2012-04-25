@@ -398,19 +398,36 @@ now.updateTime = function(time){
 
 now.sendNewScores = function(userScores, userList) {
   var curhtml = ''
+  var scoreAndUser = []
+  for (var i = 0; i < userList.length; ++i) {
+    var curUser = userList[i]
+    var score = userScores[curUser]
+    scoreAndUser.push([score, curUser])
+  }
+  scoreAndUser.sort()
+  scoreAndUser.reverse()
+  for (var i = 0; i < scoreAndUser.length; ++i) {
+    var curUser = scoreAndUser[i][1]
+    var score = scoreAndUser[i][0]
+    curhtml += '<b>' + curUser + '</b>: ' + score + '<br/>'
+  }
+  /*
   for (var i = 0; i < userList.length; ++i) {
     var curUser = userList[i]
     var score = userScores[curUser]
     curhtml += curUser + ': ' + score + '<br/>'
   }
+  */
   $('#scoreBoardRegionContents').html(curhtml)
 }
 
 textBeingTranslated = '';
 prevVotingRegionHTML = '';
+translationVotedFor = '';
 
 now.setTextToBeTranslated = function(text, userSuggestingText) {
   //$.gritter.removeAll()
+  translationVotedFor = ''
   $("#roundTimerDisplay").css("visibility", "visible")
   $("#translationRegionNoSuggestion").show()
   if (text == $('#text_to_be_translated_suggestion').text()) {
@@ -481,11 +498,22 @@ return false;
 }
 
 now.receiveTimeWarning = function(text) {
+//receiveSystemMessage('10 seconds until round ends!')
+if (translationVotedFor == '') {
 receiveSystemMessage('10 seconds until round ends!')
-if ($('#text_to_be_translated_suggestion').text() == '') {
+receiveSystemMessage('Submit a translation, or vote for one by clicking on it.')
+}
+else if ($('#text_to_be_translated_suggestion').text() == '') {
+receiveSystemMessage('10 seconds until round ends!')
+highlightSentenceNotice()
+}
+}
+
+function highlightSentenceNotice() {
 receiveSystemMessage('Highlight a sentence from the article to be translated during the next round.')
 }
-}
+
+now.highlightSentenceNotice = highlightSentenceNotice
 
 function scrollChatToBottom() {
 $('#chatregionframe').scrollTop($('#chatregionframe')[0].scrollHeight)
@@ -540,6 +568,7 @@ return false;
 }
 
 function sendTranslation(translation) {
+translationVotedFor = translation
 now.submitTranslation(translation, userid)
 //$.get('translate.cgi.py?gameid=<%= gameidsubs %>&userid=' + userid + '&text=' + encode64(textBeingTranslated) + '&translation=' + translation, function(data) {
 //console.log(data);
