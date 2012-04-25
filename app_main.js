@@ -98,6 +98,7 @@ gameIdToUserConnect[gameid] = function(userid) {
   }
   nowjs.getGroup(gameid).now.sendNewScores(userScores, userList)
   //everyone.now.sendNewScores(userScores, userList)
+  nowjs.getGroup(gameid).now.welcomeUser(userid)
   console.log('connected ' + userid)
 }
 
@@ -105,6 +106,7 @@ gameIdToUserDisconnect[gameid] = function(userid) {
   userList.remove(userid)
   userScores[userid] = 0
   nowjs.getGroup(gameid).now.sendNewScores(userScores, userList)
+  nowjs.getGroup(gameid).now.leavingUser(userid)
   console.log('disconnected ' + userid)
 }
 
@@ -150,7 +152,7 @@ if (curtime == 0) {
     nowjs.getGroup(gameid).now.askForTextSuggestions()
     isRoundActive = false
     if (secondsRoundInactive == 10) {
-      nowjs.getGroup(gameid).now.highlightSentenceNotice()
+      //nowjs.getGroup(gameid).now.highlightSentenceNotice()
     }
     if (secondsRoundInactive <= 10) {
       secondsRoundInactive += 1
