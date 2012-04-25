@@ -510,6 +510,7 @@ lastInputWasChat = false
 
 now.setTextToBeTranslated = function(text, userSuggestingText) {
   //$.gritter.removeAll()
+  clearVoting();
   translationVotedFor = ''
   $("#roundTimerDisplay").css("visibility", "visible")
   $("#translationRegionNoSuggestion").show()
@@ -778,7 +779,7 @@ return [left, right]
 
 function clearVoting() {
 $('#add_translation').val('')
-$('#voting-region').html('');
+$('#voting_region').html('');
 prevVotingRegionHTML = '';
 }
 
@@ -828,6 +829,7 @@ now.sendUserTranslations = function(translationToUserList, translationsByOrderSu
     var spanClass = '';
     if ($.inArray(userid, votingUsers) != -1) {
       spanClass = 'class="selectedTrans"';
+      translationVotedFor = translation;
     }
     var curhtml = '<li onclick="sendTranslationEscaped(\'' + escape(translation) + '\')" ' + spanClass + ' >';
     var numVotes = votingUsers.length;
@@ -855,7 +857,7 @@ now.sendUserTranslations = function(translationToUserList, translationsByOrderSu
   htmlpage += '</ul></div>';
   if (htmlpage != prevVotingRegionHTML) {
     prevVotingRegionHTML = htmlpage;
-    $('#voting-region').html(htmlpage);
+    $('#voting_region').html(htmlpage);
   }
 }
 
@@ -1159,7 +1161,7 @@ Text Being Translated: <div name='text_being_translated' id='text_being_translat
 <form action="" onsubmit='return submitNewTranslation()'>
 Translation: <input type='text' name='add_translation' id='add_translation' style='width: 70%;'></input>
 </form>
-<div id="voting-region" style='width: 70%'></div>
+<div id="voting_region" style='width: 70%'></div>
 
 </div>
 </div>
@@ -1212,7 +1214,7 @@ Translation: <input type='text' name='add_translation' id='add_translation' styl
 
 <div id="translationRegionNoSuggestion" style="width: 100%">
 
-<div id="voting-region"></div><br/>
+<div id="voting_region"></div><br/>
 
 <div style="float: left">Sentence being translated: &nbsp;</div><div name='text_being_translated' id='text_being_translated'></div>
 

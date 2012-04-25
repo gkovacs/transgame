@@ -1003,7 +1003,7 @@ gameIdToUserConnect[gameid] = function(userid) {
 
 gameIdToUserDisconnect[gameid] = function(userid) {
   userList.remove(userid)
-  userScores[userid] = 0
+  //userScores[userid] = 0
   nowjs.getGroup(gameid).now.sendNewScores(userScores, userList)
   nowjs.getGroup(gameid).now.leavingUser(userid)
   console.log('disconnected ' + userid)
