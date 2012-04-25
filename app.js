@@ -1044,6 +1044,7 @@ if (curtime == 0) {
   console.log(bestTranslation)
   nowjs.getGroup(gameid).now.sendFinalTranslation(textBeingTranslated, bestTranslation)
   updateScores()
+  sendRoundConclusion()
   }
 
   var users = dictKeys(userToSuggestedText);
@@ -1115,6 +1116,10 @@ function updateScores() {
     }
   })
   nowjs.getGroup(gameid).now.sendNewScores(userScores, userList)
+}
+
+function sendRoundConclusion() {
+nowjs.getGroup(gameid).now.receiveRoundConclusion(userToTranslation, translationToUserList, translationsByOrderSubmitted)
 }
 
 

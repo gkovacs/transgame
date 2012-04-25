@@ -396,6 +396,85 @@ now.updateTime = function(time){
   }
 }
 
+function getUserToScoreChanges(userToTranslation, translationToUserList, translationsByOrderSubmitted) {
+  userScores = {}
+  $.each(translationToUserList, function(translation,voters) {
+    if (voters == null)
+      return
+    if (voters.length < 1)
+      return
+    for (var i = 0; i < voters.length; ++i) {
+      var userid = voters[i]
+      if (userScores[userid] == null)
+        userScores[userid] = 0
+    }
+    var contributer = voters[0]
+    userScores[contributer] += 2 * (voters.length - 1)
+    for (var i = 1; i < voters.length; ++i) {
+      var voter = voters[i]
+      userScores[voter] += 1
+    }
+  })
+  return userScores
+}
+
+now.receiveRoundConclusion = function(userToTranslation, translationToUserList, translationsByOrderSubmitted) {
+  var selfReport = "You didn't vote for or submit any translations, so you got 0 points"
+  var myScore = 0
+  var myTransVote = userToTranslation[userid]
+  if (myTransVote != null) {
+    if (translationToUserList[myTransVote][0] == userid) { // I submitted
+      var numOtherVoters = translationToUserList[myTransVote].length - 1
+      myScore = numOtherVoters * 2
+      if (numOtherVoters == 0) {
+        selfReport = 'Nobody else voted for your translation "' + myTransVote + '", so you get 0 points.'
+      } else {
+        selfReport = numOtherVoters + ' other users voted for your translation "' + myTransVote + '", so you get ' + myScore + ' points.'
+      }
+    } else { // I voted for someone else
+      myScore = 1
+      var submittingUser = translationToUserList[myTransVote][0]
+      selfReport = "You voted for " + submittingUser + "'s translation \"" + myTransVote + "\", so you get 1 point."
+    }
+  }
+  
+  var userToScoreChanges = getUserToScoreChanges(userToTranslation, translationToUserList, translationsByOrderSubmitted)
+  var scoreAndUser = []
+  $.each(userToScoreChanges, function(user,score) {
+    scoreAndUser.push([score, user])
+  })
+  scoreAndUser.sort()
+  scoreAndUser.reverse()
+  var winnerName = scoreAndUser[0][1]
+  var winnerScore = scoreAndUser[0][0]
+  var winnerTranslation = userToTranslation[winnerName]
+  
+  var winnerReport = (winnerScore/2) + ' other users voted for ' + winnerName + '\'s translation "' + myTransVote + '", so ' + winnerName + ' gets ' + winnerScore + ' points.'
+  
+  
+  var userScoreReport = ''
+  for (var i = 0; i < scoreAndUser.length; ++i) {
+    var score = scoreAndUser[i][0]
+    var user = scoreAndUser[i][1]
+    userScoreReport += user + ' gets ' + score + ' points'
+    if (i != scoreAndUser.length - 1)
+      userScoreReport += '<br/>'
+  }
+  
+  var scoreReport = []
+  if (winnerName == userid || winnerScore == myScore) {
+    scoreReport.push('<b><u>Round Results</u></b>: You get ' + winnerScore + ' points for your translation "' + myTransVote + '".')
+    scoreReport.push('<br/><b>My Score</b>: ' + selfReport)
+  } else {
+    scoreReport.push('<b><u>Round Results</u></b>: You get ' + myScore + ' points. ' + winnerName + ' gets the most points, ' + winnerScore + ', for his translation "' + winnerTranslation + '".')
+    scoreReport.push('<br/><b>My Score</b>: ' + selfReport)
+    scoreReport.push('<br/><b>Winner\'s Score</b>: ' + winnerReport)
+  }
+  scoreReport.push('<br/><b>Score Changes</b><br/>' + userScoreReport)
+  scoreReport.push("<br/><b>Scoring Rules</b>: 1 point for voting for someone else's translation, 2 points for each other player who votes for your translation.")
+  receiveSystemMessageExtendedArray(previousAppendingArray(scoreReport))
+}
+
 now.sendNewScores = function(userScores, userList) {
   var curhtml = ''
   var scoreAndUser = []
@@ -544,7 +623,7 @@ if (translationVotedFor == '') {
 receiveSystemMessageAppending("<i>10 seconds until round ends, you haven't voted yet.</i>", " <i>You can vote for a translation by clicking on one, or submit your own translation.</i>")
 }
 else if ($('#text_to_be_translated_suggestion').text() == '') {
-receiveSystemMessageAppending("<i>10 seconds until round ends, you haven't suggested a sentence yet.</i>", " <i>You can suggest a sentence to be translated during the next round by highlighting/selecting it in the article text below. If multiple people suggest sentences, one will be picked randomly.</i>")
+receiveSystemMessageAppending("<i>10 seconds until round ends, you haven't suggested a sentence yet.</i>", " <i>You can suggest a sentence to be translated during the next round by selecting it in the article text below. If multiple people suggest sentences, one will be picked randomly.</i>")
 }
 }
 
@@ -620,15 +699,19 @@ args = $.map(args, function(x) { return htmlEscape(x) } )
 receiveSystemMessageExtendedArray(args)
 }
 
-function receiveSystemMessageAppending() {
-var args = Array.prototype.slice.call(arguments)
+function previousAppendingArray(args) {
 if (args.length <= 1) return
 var nargs = []
 nargs[0] = args[0]
 for (var i = 1; i < args.length; ++i) {
 nargs[i] = nargs[i-1] + args[i]
 }
-receiveSystemMessageExtendedArray(nargs)
+return nargs
+}
+
+function receiveSystemMessageAppending() {
+var args = Array.prototype.slice.call(arguments)
+receiveSystemMessageExtendedArray(previousAppendingArray(args))
 }
 
 function showAvoidSwitchingToTransHint() {
@@ -714,7 +797,7 @@ $('#timeDisplay').text(data);
 
 now.welcomeUser = function(nuserid) {
   if (nuserid == userid) {
-    receiveSystemMessageAppending("Welcome to <i>TransGame</i>, the competitve translation game!", "<br/><b>Playing</b>: Highlight a sentence from the article to start a new round. In each round, you and other players submit translations and vote on the best one, until the timer reaches 0.", "<br/><b>Scoring</b>: 1 point for voting for someone else's translation, 2 points for each other player who votes for your translation.", "<br/><b>Chatting</b>: You can chat with other players in this area by typing a message in the box below and pressing enter.")
+    receiveSystemMessageAppending("Welcome to TransGame!", "<br/><b>Playing</b>: Highlight a sentence from the article to start a new round. In each round, you and other players submit translations and vote on the best one, until the timer reaches 0.", "<br/><b>Scoring Rules</b>: 1 point for voting for someone else's translation, 2 points for each other player who votes for your translation.", "<br/><b>Chatting</b>: You can chat with other players in this area by typing a message in the box below and pressing enter.")
   } else {
     receiveSystemMessage(nuserid + ' joined the game')
   }
