@@ -1,0 +1,177 @@
+33a34,51
+> servername = fs.readFileSync(path.join(__dirname,'servername.txt')).toString().trim()
+> 
+> var redisO = require('redis')
+> 
+> var ejs = require('ejs')
+> 
+> var fs = require('fs')
+> 
+> var crypto = require('crypto');
+> 
+> 
+> 
+> //var express = require('express')
+> 
+> var $ = require('jQuery');
+> 
+> var staticResource = require('./staticresource.js');
+> var srhandler = staticResource.createHandler(fs.realpathSync('./static'));
+53c71,93
+< 	
+---
+> var lobbyData = ''
+> var indexData = ''
+> //var nowjsData = ''
+> 
+> function silentConsoleLog(data) {
+> 
+> }
+> 
+> function writeResponse(response, data) {
+>   response.writeHead(200, {
+>       'Content-Type': 'text/html'
+>     , 'Content-Length': data.length
+>   });
+>   response.end(data)
+> }
+> 
+> function writeResponseJS(response, data) {
+>   response.writeHead(200, {
+>       'Content-Type': 'text/javascript'
+>     , 'Content-Length': data.length
+>   });
+>   response.end(data)
+> }
+56,57c96,97
+< 	.use(connect.cookieParser(config.secret))
+<   	.use(connect.session({
+---
+>   	server.use(connect.cookieParser(config.secret))
+>   	server.use(connect.session({
+61,64c101,151
+< 	.use(function(request, response){
+< 	var url_data = url.parse(request.url);
+< 	
+< 	console.log("(" + process.pid + ") New Request: ", request.url);
+---
+> 	server.use(function(request, response){
+> 
+> //var server = connect.createServer(function(request, response){
+> 	var url_data = url.parse(request.url, true);
+> 
+> 	// only requests that start with this get proxied - the rest get 
+> 	// redirected to either a url that matches this or the home page
+> 	if (request.url.indexOf('/lobby') == 0) {
+>     if (lobbyData == '') {
+>       fs.readFile('views/lobby.ejs', function(err, data) {
+>         lobbyData = data.toString()
+>         writeResponse(response, ejs.render(lobbyData))
+>       })
+>     } else {
+>       writeResponse(response, ejs.render(lobbyData))
+>     }
+>     return
+> 	}
+> 	if (srhandler.handle(url_data.path, request, response)) {
+> 	  return
+> 	}
+> 	if (request.url.indexOf('/?') == 0) {
+>     urlD = url_data.query['url']
+>     gameidsubs = new Buffer(url, 'binary').toString('base64').replace('+', '-').replace('_', '/');
+>     gameidalphanumericsubs = crypto.createHash('md5').update(urlD).digest("hex").slice(0,50);
+>     if (indexData == '') {
+>       fs.readFile('views/index.ejs', function(err, data) {
+>         indexData = data.toString()
+>         writeResponse(response, ejs.render(indexData))
+>       })
+>     } else {
+>       writeResponse(response, ejs.render(indexData))
+>     }
+>     return
+>   }
+>   /*
+>   if (request.url.indexOf('/nowjs') == 0) {
+>     if (nowjsData == '') {
+>       fs.readFile('nowjs/now.js', function(err, data) {
+>         nowjsData = data.toString()
+>         writeResponseJS(response, nowjsData)
+>       })
+>     } else {
+>       writeResponseJS(response, nowjsData)
+>     }
+>     return
+>   }
+>   */
+>   //return
+> 
+> 	silentConsoleLog("(" + process.pid + ") New Request: ", request.url);
+74c161
+< 		request.url = "/index.html"; 
+---
+> 		request.url = "/proxyIndex.html"; 
+111a199,200
+> 
+> 	
+186c275
+< 	console.log("sending these cookies: " + headers.cookie);
+---
+> 	silentConsoleLog("sending these cookies: " + headers.cookie);
+243c332
+< 			console.log("fixing redirect");
+---
+> 			silentConsoleLog("fixing redirect");
+254,256c343,345
+< 		//console.log("content-type: " + ct);
+< 		//console.log("needs_parsed: " + needs_parsed);
+< 		//console.log("needs_decoded: " + needs_decoded);
+---
+> 		//silentConsoleLog("content-type: " + ct);
+> 		//silentConsoleLog("needs_parsed: " + needs_parsed);
+> 		//silentConsoleLog("needs_decoded: " + needs_decoded);
+269c358
+< 			//console.log("data event", request.url, chunk.toString());
+---
+> 			//silentConsoleLog("data event", request.url, chunk.toString());
+304c393
+< 				console.log('running css rules');
+---
+> 				silentConsoleLog('running css rules');
+522c611
+< 	console.log('storing these cookies: ', cookies);
+---
+> 	silentConsoleLog('storing these cookies: ', cookies);
+555c644
+< 			console.log('deleting cookie', thisCookie.expires);
+---
+> 			silentConsoleLog('deleting cookie', thisCookie.expires);
+653c742
+< 		console.log("recirecting to " + thisSite(request) + site);
+---
+> 		silentConsoleLog("redirecting to " + thisSite(request) + site);
+757c846
+< 	console.log("status request recieved on pid " + process.pid);
+---
+> 	silentConsoleLog("status request recieved on pid " + process.pid);
+762c851
+< 		console.log("sending status request message");
+---
+> 		silentConsoleLog("sending status request message");
+768c857
+< 		console.log("Error: status responses timeout reached");
+---
+> 		silentConsoleLog("Error: status responses timeout reached");
+811a901
+> 
+860c950
+< 			console.log('message recieved by master ', message);
+---
+> 			silentConsoleLog('message recieved by master ', message);
+925c1015
+< 	console.log('node-unblocker proxy server with pid ' + process.pid + ' running on ' + 
+---
+> 	silentConsoleLog('node-unblocker proxy server with pid ' + process.pid + ' running on ' + 
+933c1023
+< 		console.log("messge recieved by child (" + process.pid + ") ", message);
+---
+> 		silentConsoleLog("messge recieved by child (" + process.pid + ") ", message);

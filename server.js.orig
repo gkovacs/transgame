@@ -31,24 +31,6 @@ var http = require('http'),
 	cluster = require('cluster'),
 	Iconv = require('iconv').Iconv,
 	numCPUs = require('os').cpus().length;
-servername = fs.readFileSync(path.join(__dirname,'servername.txt')).toString().trim()
-
-var redisO = require('redis')
-
-var ejs = require('ejs')
-
-var fs = require('fs')
-
-var crypto = require('crypto');
-
-
-
-//var express = require('express')
-
-var $ = require('jQuery');
-
-var staticResource = require('./staticresource.js');
-var srhandler = staticResource.createHandler(fs.realpathSync('./static'));
 
 
 // local dependencies
@@ -68,87 +50,18 @@ if(config.redistogo_url) {
 	redis = require('redis').createClient(config.redis_port, config.redis_host, config.redis_options);
 }
 
-var lobbyData = ''
-var indexData = ''
-//var nowjsData = ''
-
-function silentConsoleLog(data) {
-
-}
-
-function writeResponse(response, data) {
-  response.writeHead(200, {
-      'Content-Type': 'text/html'
-    , 'Content-Length': data.length
-  });
-  response.end(data)
-}
-
-function writeResponseJS(response, data) {
-  response.writeHead(200, {
-      'Content-Type': 'text/javascript'
-    , 'Content-Length': data.length
-  });
-  response.end(data)
-}
+	
 
 var server = connect()
-  	server.use(connect.cookieParser(config.secret))
-  	server.use(connect.session({
+	.use(connect.cookieParser(config.secret))
+  	.use(connect.session({
   		store: new RedisStore({client: redis}),
   		cookie: { path: '/', httpOnly: false, maxAge: null }
   	}))
-	server.use(function(request, response){
-
-//var server = connect.createServer(function(request, response){
-	var url_data = url.parse(request.url, true);
-
-	// only requests that start with this get proxied - the rest get 
-	// redirected to either a url that matches this or the home page
-	if (request.url.indexOf('/lobby') == 0) {
-    if (lobbyData == '') {
-      fs.readFile('views/lobby.ejs', function(err, data) {
-        lobbyData = data.toString()
-        writeResponse(response, ejs.render(lobbyData))
-      })
-    } else {
-      writeResponse(response, ejs.render(lobbyData))
-    }
-    return
-	}
-	if (srhandler.handle(url_data.path, request, response)) {
-	  return
-	}
-	if (request.url.indexOf('/?') == 0) {
-    urlD = url_data.query['url']
-    gameidsubs = new Buffer(url, 'binary').toString('base64').replace('+', '-').replace('_', '/');
-    gameidalphanumericsubs = crypto.createHash('md5').update(urlD).digest("hex").slice(0,50);
-    if (indexData == '') {
-      fs.readFile('views/index.ejs', function(err, data) {
-        indexData = data.toString()
-        writeResponse(response, ejs.render(indexData))
-      })
-    } else {
-      writeResponse(response, ejs.render(indexData))
-    }
-    return
-  }
-  /*
-  if (request.url.indexOf('/nowjs') == 0) {
-    if (nowjsData == '') {
-      fs.readFile('nowjs/now.js', function(err, data) {
-        nowjsData = data.toString()
-        writeResponseJS(response, nowjsData)
-      })
-    } else {
-      writeResponseJS(response, nowjsData)
-    }
-    return
-  }
-  */
-  //return
-
-	silentConsoleLog("(" + process.pid + ") New Request: ", request.url);
+	.use(function(request, response){
+	var url_data = url.parse(request.url);
+	
+	console.log("(" + process.pid + ") New Request: ", request.url);
 	
 	
     incrementRequests();
@@ -158,7 +71,7 @@ var server = connect()
 	// (located at /proxy so that we can more easily tell the difference 
 	// between a user who is looking for the home page and a "/" link)
 	if(url_data.pathname == "/proxy"){
-		request.url = "/proxyIndex.html"; 
+		request.url = "/index.html"; 
 		// todo: refactor this to make more sense
 		return sendIndex(request, response);
 	}
@@ -195,8 +108,6 @@ var server = connect()
 		);
 		response.end(); 
 	}
-	
-
 	
 	// any other url gets redirected to the correct proxied url if we can
 	// determine it based on their referrer, or the home page otherwise
@@ -272,7 +183,7 @@ function proxy(request, response) {
 	// (assume / path and same domain as request's referer)
 	headers.cookie = getCookies(request, uri);
 	
-	silentConsoleLog("sending these cookies: " + headers.cookie);
+	console.log("sending these cookies: " + headers.cookie);
 	
 	// overwrite the referer with the correct referer
 	if(request.headers.referer){
@@ -329,7 +240,7 @@ function proxy(request, response) {
 		// todo: also fix refresh and url headers
 		if(headers.location && headers.location.substr(0,4) == 'http'){
 			headers.location = thisSite(request) + "/" + headers.location;
-			silentConsoleLog("fixing redirect");
+			console.log("fixing redirect");
 		}
 		
 		if(headers['set-cookie']){
@@ -340,9 +251,9 @@ function proxy(request, response) {
 		//  fire off out (possibly modified) headers
 		response.writeHead(remote_response.statusCode, headers);
 		
-		//silentConsoleLog("content-type: " + ct);
-		//silentConsoleLog("needs_parsed: " + needs_parsed);
-		//silentConsoleLog("needs_decoded: " + needs_decoded);
+		//console.log("content-type: " + ct);
+		//console.log("needs_parsed: " + needs_parsed);
+		//console.log("needs_decoded: " + needs_decoded);
 		
 		
 		// sometimes a chunk will end in data that may need to be modified, but it is impossible to tell
@@ -355,7 +266,7 @@ function proxy(request, response) {
 		
 		// todo : account for varying encodings
 		function parse(chunk){
-			//silentConsoleLog("data event", request.url, chunk.toString());
+			//console.log("data event", request.url, chunk.toString());
 			
 			if( chunk_remainder_bin ){
 				var buf = new Buffer(chunk_remainder_bin.length + chunk.length);
@@ -390,7 +301,7 @@ function proxy(request, response) {
 			
 			// if we're in a stylesheet, run a couple of extra regexs to avoid 302's
 			if(ct == 'text/css'){
-				silentConsoleLog('running css rules');
+				console.log('running css rules');
 				chunk = chunk.replace(re_css_abs, "$1" + thisSite(request) + "/$2");
 				chunk = chunk.replace(re_css_rel_root, "$1" + thisSite(request) + "/" + uri.protocol + "//" + uri.hostname + "$2");			
 			}
@@ -608,7 +519,7 @@ function getCookies(request, uri){
 * Parses the set-cookie header from the remote server and stores the cookies in the user's session
 */
 function storeCookies(request, uri, cookies){
-	silentConsoleLog('storing these cookies: ', cookies);
+	console.log('storing these cookies: ', cookies);
 
 	if(!cookies) return;
 	
@@ -641,7 +552,7 @@ function storeCookies(request, uri, cookies){
 		// now that the cookie is set (deleting any older cookie of the same name), 
 		// check the expiration date and delete it if it is outdated
 		if(isExpired(thisCookie)){
-			silentConsoleLog('deleting cookie', thisCookie.expires);
+			console.log('deleting cookie', thisCookie.expires);
 			delete request.session[domain][thisCookie.path][thisCookie.name];
 		}
 
@@ -739,7 +650,7 @@ function redirectTo(request, response, site){
 	if(site == "/") site = ""; // no endless redirect loops
 	try {
 		response.writeHead('302', {'Location': thisSite(request) + site});
-		silentConsoleLog("redirecting to " + thisSite(request) + site);
+		console.log("recirecting to " + thisSite(request) + site);
 	} catch(ex) {
 		// the headers were already sent - we can't redirect them
 		console.error("Failed to send redirect", ex);
@@ -843,18 +754,18 @@ var waitingStatusResponses = [];
 
 // simple way to get the curent status of the server
 function status(request, response){
-	silentConsoleLog("status request recieved on pid " + process.pid);
+	console.log("status request recieved on pid " + process.pid);
 	response.writeHead("200", {"Content-Type": "text/plain", "Expires": 0});
 	
 	// only send out a new status request if we don't already have one in the pipe
 	if(waitingStatusResponses.length == 0) {
-		silentConsoleLog("sending status request message");
+		console.log("sending status request message");
 		process.send({type: "status.request", from: process.pid});
 	}
 	
 	// 1 second timeout in case the master doesn't respond quickly enough
 	response.timeout = setTimeout(function(){
-		silentConsoleLog("Error: status responses timeout reached");
+		console.log("Error: status responses timeout reached");
 		sendStatus({error: "No response from the cluster master after 1 second"});
 	}, 1000);
 	
@@ -897,7 +808,6 @@ function sendStatus(status){
  * Set up clustering
  */
 if (cluster.isMaster) {
-
 
 	// the master will track a few statics and keep the workers up and running
 	
@@ -947,7 +857,7 @@ if (cluster.isMaster) {
 				return;
 			}
 			
-			silentConsoleLog('message recieved by master ', message);
+			console.log('message recieved by master ', message);
 			
 			// if it's a status request sent to everyone, respond with the master's status before passing it along
 			if (message.type == "status.request") {
@@ -1012,7 +922,7 @@ if (cluster.isMaster) {
 	// if we're a worker, read the index file and then fire up the server
 	setupIndex();
 	http.Server(server).listen(config.port, config.ip);
-	silentConsoleLog('node-unblocker proxy server with pid ' + process.pid + ' running on ' + 
+	console.log('node-unblocker proxy server with pid ' + process.pid + ' running on ' + 
 		((config.ip) ? config.ip + ":" : "port ") + config.port
 	);
 	
@@ -1020,7 +930,7 @@ if (cluster.isMaster) {
 		if (!message.type) {
 			return;
 		}
-		silentConsoleLog("messge recieved by child (" + process.pid + ") ", message);
+		console.log("messge recieved by child (" + process.pid + ") ", message);
 		if (message.type == "status.response") {
 			sendStatus(message);
 		}
