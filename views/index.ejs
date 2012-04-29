@@ -419,7 +419,7 @@ function getUserToScoreChanges(userToTranslation, translationToUserList, transla
 }
 
 now.receiveRoundConclusion = function(userToTranslation, translationToUserList, translationsByOrderSubmitted) {
-  var selfReport = "You didn't vote for or submit any translations, so you got 0 points"
+  var selfReport = "You didn't vote for or submit any translations, so you got 0 points."
   var myScore = 0
   var myTransVote = userToTranslation[userid]
   if (myTransVote != null) {
@@ -445,6 +445,15 @@ now.receiveRoundConclusion = function(userToTranslation, translationToUserList, 
   })
   scoreAndUser.sort()
   scoreAndUser.reverse()
+  
+  var scoreReport = []
+  if (scoreAndUser.length == 0) {
+    scoreReport.push('<b><u>Round Results</u></b>: ' + selfReport)
+    scoreReport.push("<br/><b>Scoring Rules</b>: 1 point for voting for someone else's translation, 2 points for each other player who votes for your translation.")
+    receiveSystemMessageExtendedArray(previousAppendingArray(scoreReport))
+    return
+  }
+  
   var winnerName = scoreAndUser[0][1]
   var winnerScore = scoreAndUser[0][0]
   var winnerTranslation = userToTranslation[winnerName]
@@ -461,7 +470,7 @@ now.receiveRoundConclusion = function(userToTranslation, translationToUserList, 
       userScoreReport += '<br/>'
   }
   
-  var scoreReport = []
+  
   if (winnerName == userid || winnerScore == myScore) {
     scoreReport.push('<b><u>Round Results</u></b>: You get ' + winnerScore + ' points for your translation "' + myTransVote + '".')
     scoreReport.push('<br/><b>My Score</b>: ' + selfReport)
