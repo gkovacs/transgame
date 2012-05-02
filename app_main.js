@@ -79,16 +79,16 @@ gameIdToUserDisconnect = {}
 
 function initializeNewGame(gameid) {
 
-userToSuggestedText = {}
-textBeingTranslated = ''
-contributingUser = ''
+var userToSuggestedText = {}
+var textBeingTranslated = ''
+var contributingUser = ''
 
-translationsByOrderSubmitted = []
-userToTranslation = {}
-translationToUserList = {}
+var translationsByOrderSubmitted = []
+var userToTranslation = {}
+var translationToUserList = {}
 
-userScores = {}
-userList = []
+var userScores = {}
+var userList = []
 
 gameIdToUserConnect[gameid] = function(userid) {
   if (userScores[userid] == null)
@@ -96,6 +96,7 @@ gameIdToUserConnect[gameid] = function(userid) {
   if ($.inArray(userid, userList) == -1) {
     userList.push(userid)
   }
+  nowjs.getGroup(gameid).now.sendUserTranslations(translationToUserList, translationsByOrderSubmitted)
   nowjs.getGroup(gameid).now.sendNewScores(userScores, userList)
   //everyone.now.sendNewScores(userScores, userList)
   nowjs.getGroup(gameid).now.welcomeUser(userid)
@@ -113,6 +114,7 @@ gameIdToUserDisconnect[gameid] = function(userid) {
 function getBestTranslation() {
   var bestTranslation = ''
   var bestNumVotes = 0
+  console.log(translationsByOrderSubmitted)
   for (var i = 0; i < translationsByOrderSubmitted.length; ++i) {
     var translation = translationsByOrderSubmitted[i]
     if (translationToUserList[translation] == null)
@@ -126,8 +128,8 @@ function getBestTranslation() {
   return bestTranslation
 }
 
-isRoundActive = true
-secondsRoundInactive = 0
+var isRoundActive = true
+var secondsRoundInactive = 0
 var curtime = 0
 setInterval(function() {
 //var curtime = Math.round((new Date()).getTime() / 1000);
@@ -141,11 +143,14 @@ if (curtime == 0) {
   // store translated stuff for persistence
   console.log('storing stuff for persistence')
   client.set(gameid + '|' + textBeingTranslated, JSON.stringify({'translationToUserList': translationToUserList, 'translationsByOrderSubmitted': translationsByOrderSubmitted, 'userToTranslation': userToTranslation}))
-  var bestTranslation = getBestTranslation()
-  console.log(bestTranslation)
+  var bestTranslation = getBestTranslation().trim()
+  console.log('best translation is: ' + bestTranslation)
   nowjs.getGroup(gameid).now.sendFinalTranslation(textBeingTranslated, bestTranslation)
+  console.log('final translation sent')
   updateScores()
+  console.log('scores updated')
   sendRoundConclusion()
+  console.log('round conclusion sent')
   }
 
   var users = dictKeys(userToSuggestedText);
@@ -277,7 +282,7 @@ nowjs.getGroup(gameid).now.sendChatMessage = function(text, userid) {
 nowjs.on("connect", function(){
   var userid = this.now.userid
   var url = this.now.url
-  //everyone.now.quitUser(userid, url)
+  everyone.now.quitUser(userid, url)
   //useridToUser[userid] = this
   if (url != null) {
     if ($.inArray(url, gameList) == -1) {
@@ -290,7 +295,7 @@ nowjs.on("connect", function(){
     gameToUsers[url].push(userid)
     nowjs.getGroup(url).addUser(this.user.clientId)
     this.now.groupAddingFinished()
-    nowjs.getGroup(url).now.sendUserTranslations(translationToUserList, translationsByOrderSubmitted)
+    //nowjs.getGroup(url).now.sendUserTranslations(translationToUserList, translationsByOrderSubmitted)
     gameIdToUserConnect[url](userid)
     //everyone.now.sendGameList(gameToUsers, gameList)
   }

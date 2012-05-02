@@ -419,6 +419,10 @@ function getUserToScoreChanges(userToTranslation, translationToUserList, transla
 }
 
 now.receiveRoundConclusion = function(userToTranslation, translationToUserList, translationsByOrderSubmitted) {
+  console.log('receiving round conclusion')
+  console.log(userToTranslation)
+  console.log(translationToUserList)
+  console.log(translationsByOrderSubmitted)
   var selfReport = "You didn't vote for or submit any translations, so you got 0 points."
   var myScore = 0
   var myTransVote = userToTranslation[userid]
@@ -544,7 +548,8 @@ $.gritter.add({
 }
 */
 
-$('#suggestTextLabel').text('Highlight a sentence from the article that you want to translate.')
+$('#suggestTextLabel').html('<b>Use your mouse to highlight a sentence from the article below that you want to translate.</b>')
+$('#suggestTextLabel').css('float', 'center')
 $('#textSuggestionRegion').show()
 
 $("#translationRegionNoSuggestion").hide(600)
@@ -553,6 +558,9 @@ $("#roundTimerDisplay").css("visibility", "hidden")
 
 now.quitUser = function(quserid, qgameid) {
 if (userid != quserid) {
+  return
+}
+if (qgameid == null || qgameid == '') {
   return
 }
 if (qgameid == gameid) {
@@ -820,6 +828,8 @@ now.leavingUser = function(nuserid) {
 now.sendFinalTranslation = function(textBeingTranslated, bestTranslation) {
   //var newText = getFrameHTML().replaceAll(textBeingTranslated, bestTranslation)
   //setFrameHTML(newText)
+  if (textBeingTranslated == '' || bestTranslation == '')
+    return
   replaceFrameText(textBeingTranslated, bestTranslation)
 }
 
@@ -896,9 +906,11 @@ function isRoundOver() {
 function setTextInSuggestionBox(txt) {
 $('#text_to_be_translated_suggestion').text(txt);
 if (txt == '') {
-$('#suggestTextLabel').text('Highlight a sentence from the article that you want to translate.')
+$('#suggestTextLabel').html('<b>Use your mouse to highlight a sentence from the article that you want to translate.</b>')
+$('#suggestTextLabel').css('float', 'center')
 } else {
 $('#suggestTextLabel').text('Sentence I suggested to be translated during the next round: ')
+$('#suggestTextLabel').css('float', 'left')
 $('#textSuggestionRegion').show()
 }
 }
@@ -1247,7 +1259,7 @@ Translation: <input type='text' name='add_translation' id='add_translation' styl
 </div>
 
 <div id='textSuggestionRegion'>
-<div id='suggestTextLabel' style="float: left">Highlight a sentence from the article that you want to translate.</div><div style="float: left">&nbsp;</div><div id='text_to_be_translated_suggestion' style="float: left"></div><br/><br/></div>
+<div id='suggestTextLabel' style="float: center; text-align: center"><b>Use your mouse to highlight a sentence from the article below that you want to translate.</b></div><div style="float: left">&nbsp;</div><div id='text_to_be_translated_suggestion' style="float: left"></div><br/><br/></div>
 
 </div>
 
