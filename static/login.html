@@ -9,6 +9,15 @@
 <script src="jquery.min.js"></script>
 <script src="jquery.cookie.js"></script>
 <script>
+function randomDarkColor() {
+var darkness = 160
+var r = Math.floor(Math.random()*darkness)
+var g = Math.floor(Math.random()*darkness)
+//var b = Math.floor(darkness*1.5) - r - g
+var b = Math.floor(Math.random()*darkness)
+return 'rgb(' + r + ',' + g + ',' + b + ')'
+}
+
 function gotoPage() {
 userid = document.forms["frm1"]["userName"].value;
 if (userid == '') {
@@ -16,6 +25,7 @@ alert('please enter a username');
 return false;
 }
 $.cookie('transgame_userid', userid, { expires: 7, path: '/' });
+$.cookie('transgame_usercolor', randomDarkColor(), { expires: 7, path: '/'});
 window.location = 'lobby';
 return false;
 
@@ -24,7 +34,8 @@ return false;
 }
 
 userid = $.cookie('transgame_userid');
-if (userid != null) {
+usercolor = $.cookie('transgame_usercolor');
+if (userid != null && usercolor != null) {
 window.location = 'lobby';
 }
 

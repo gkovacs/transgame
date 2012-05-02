@@ -19,7 +19,8 @@
 <script>
 
 userid = $.cookie('transgame_userid');
-if (userid == null) {
+usercolor = $.cookie('transgame_usercolor');
+if (userid == null || usercolor == null) {
   alert('warning: no userid, going back to login page');
   window.location = 'login.html';
   //userid = Math.floor(Math.random()*10000001);

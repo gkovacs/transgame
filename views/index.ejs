@@ -6,7 +6,7 @@
 <!--<style type="text/css" src='jquery-ui.css'></style>-->
 <!--<style type="text/css" src='ui.notify.css'></style>-->
 <link rel="stylesheet" type="text/css" href="css/jquery.gritter.css" />
-<link href='css/bootstrap.css' rel='stylesheet' type='text/css'>
+<!--<link href='css/bootstrap.css' rel='stylesheet' type='text/css'>-->
 <style type="text/css">
 
 /* Apply the element you want to drag/resize */
@@ -252,7 +252,7 @@ li:hover
 border-radius: 10px;
 border-style:solid;
 border-width:2px;
-border-color:black;
+border-color:white;
 }
 
 .selectedTrans {
@@ -302,7 +302,7 @@ width: 250px; /*Width of frame div*/
 height: 40%;
 overflow-x: hidden; /*Disable scrollbars. Set to "scroll" to enable*/
 overflow-y: auto;
-background: green;
+background: #222222;
 color: white;
 }
 
@@ -314,7 +314,7 @@ width: 250px; /*Width of frame div*/
 height: 40%;
 overflow-x: hidden; /*Disable scrollbars. Set to "scroll" to enable*/
 overflow-y: auto;
-background: green;
+background: #222222;
 color: white;
 }
 
@@ -325,7 +325,7 @@ left: 250px;
 right: 250px;
 height: 40%;
 overflow: auto; /*Disable scrollbars. Set to "scroll" to enable*/
-background: navy;
+background: #000000;
 color: white;
 }
 
@@ -353,6 +353,135 @@ width: 100%;
 }
 
 
+.moreinfolink {
+    background-color: #FFE96B;
+    color: #333333;
+    text-decoration: none;
+    -moz-border-radius-bottomright: 5px;
+    -moz-border-radius-topright: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    -moz-border-radius-topleft: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -webkit-border-top-left-radius: 5px;
+}
+
+* {
+    margin: 0px;
+    padding: 0px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    line-height: 16px;
+    color: #FFFFFF;
+    border: none;
+}
+input[type="submit"]::-moz-focus-inner {
+    border: 0;
+}
+input[type="submit"], input[type="text"] {
+    line-height:normal !important;
+}
+
+.submitstyle {
+    opacity: 0.9;
+}
+
+.submitstyle:hover {
+    opacity: 1.0;
+}
+
+.submitstyle:active {
+    opacity: 1.0;
+}
+
+.submitstyle input { /*-moz-border-radius: 5px 5px 5px 5px;*/
+    /*-moz-box-shadow: 0 0 17px #999 inset;*/
+    background: none repeat scroll 0 0 white;
+}
+
+.submitstyle p {
+    line-height: 30px;
+}
+
+.submitstyle .text {
+    -moz-border-radius-bottomleft: 5px;
+    -moz-border-radius-topleft: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -webkit-border-top-left-radius: 5px;
+    background: #F9FAFA;
+    border: 1px solid #DBE1E6;
+    padding: 2px;
+    width: 180px;
+    color: #333333;
+    -webkit-border-top-left-radius: 5px;
+    /*opacity: 0.6;*/
+}
+
+.submitstyle .button {
+    -moz-border-radius-bottomright: 5px;
+    -moz-border-radius-topright: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    background: -moz-linear-gradient(center bottom, #BBBBBB 0%, #FAFAFA 100%)
+        repeat scroll 0 0 transparent;
+    background: -webkit-gradient(linear, left bottom, left top, color-stop(0, #BBBBBB),
+        color-stop(1, #FAFAFA) );
+    border: 1px solid #DBE1E6;
+    border-left: none;
+    cursor: pointer;
+    padding: 2px;
+    width: 70px;
+    cursor: pointer;
+    color: #333333;
+    /*opacity: 0.6;*/
+}
+
+.submitstyle .transbutton {
+    -moz-border-radius-bottomright: 5px;
+    -moz-border-radius-topright: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    background: -moz-linear-gradient(center bottom, #BBBBBB 0%, #FAFAFA 100%)
+        repeat scroll 0 0 transparent;
+    background: -webkit-gradient(linear, left bottom, left top, color-stop(0, #BBBBBB),
+        color-stop(1, #FAFAFA) );
+    border: 1px solid #DBE1E6;
+    border-left: none;
+    cursor: pointer;
+    padding: 2px;
+    width: 130px;
+    cursor: pointer;
+    color: #333333;
+    /*opacity: 0.6;*/
+}
+
+.submitstyle .button:hover {
+    background: -moz-linear-gradient(center bottom, #999 0%, #FAFAFA 100%)
+        repeat scroll 0 0 transparent;
+    background: -webkit-gradient(linear, left bottom, left top, color-stop(0, #999),
+        color-stop(1, #FAFAFA) );
+}
+
+.submitstyle .button:active {
+    background: -moz-linear-gradient(center bottom, #999 0%, #888 100%)
+        repeat scroll 0 0 transparent;
+    background: -webkit-gradient(linear, left bottom, left top, color-stop(0, #999),
+        color-stop(1, #888) );
+}
+​
+.votebubble {
+    background-color: #000000;
+    -moz-border-radius-bottomright: 5px;
+    -moz-border-radius-topright: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    float: left;
+    position: relative;
+    width: 10px;
+    height: 20px;
+}
+
 </style>
 </head>
 <script src="jquery.min.js"></script>
@@ -372,7 +501,8 @@ String.prototype.replaceAll = function (replaceThis, withThis) {
 };
 
 userid = $.cookie('transgame_userid');
-if (userid == null) {
+usercolor = $.cookie('transgame_usercolor');
+if (userid == null || usercolor == null) {
   alert('warning: no userid, going back to login page');
   window.location = 'login.html';
   //userid = Math.floor(Math.random()*10000001);
@@ -380,6 +510,7 @@ if (userid == null) {
 }
 
 now.userid = userid
+now.usercolor = usercolor
 now.url = '<%= urlD %>'
 gameid = '<%= urlD %>'
 
@@ -488,6 +619,14 @@ now.receiveRoundConclusion = function(userToTranslation, translationToUserList, 
   receiveSystemMessageExtendedArray(previousAppendingArray(scoreReport))
 }
 
+userColors = {}
+
+now.sendNewUserColors = function(nuserColors, userList) {
+  $.each(nuserColors, function(user,color) {
+    userColors[user] = color
+  })
+}
+
 now.sendNewScores = function(userScores, userList) {
   var curhtml = ''
   var scoreAndUser = []
@@ -501,7 +640,8 @@ now.sendNewScores = function(userScores, userList) {
   for (var i = 0; i < scoreAndUser.length; ++i) {
     var curUser = scoreAndUser[i][1]
     var score = scoreAndUser[i][0]
-    curhtml += '<b>' + curUser + '</b>: ' + score + '<br/>'
+    var color = userColors[curUser]
+    curhtml += '<span style="background-color: ' + color + '"><b>' + curUser + '</b>: ' + score + '<span><br/>'
   }
   /*
   for (var i = 0; i < userList.length; ++i) {
@@ -548,7 +688,7 @@ $.gritter.add({
 }
 */
 
-$('#suggestTextLabel').html('<b>Use your mouse to highlight a sentence from the article below that you want to translate.</b>')
+$('#suggestTextLabel').html('<b>Use your mouse to select a sentence from the article below that you want to translate.</b>')
 $('#suggestTextLabel').css('float', 'center')
 $('#textSuggestionRegion').show()
 
@@ -641,7 +781,7 @@ if (translationVotedFor == '') {
 receiveSystemMessageAppending("<i>10 seconds until round ends, you haven't voted yet.</i>", " <i>You can vote for a translation by clicking on one, or submit your own translation.</i>")
 }
 else if ($('#text_to_be_translated_suggestion').text() == '') {
-receiveSystemMessageAppending("<i>10 seconds until round ends, you haven't suggested a sentence yet.</i>", " <i>You can suggest a sentence to be translated during the next round by selecting it in the article text below. If multiple people suggest sentences, one will be picked randomly.</i>")
+receiveSystemMessageAppending("<i>10 seconds until round ends, you haven't suggested a sentence yet.</i>", " <i>You can suggest a sentence to be translated during the next round by selecting it with your mouse in the article text below. If multiple people suggest sentences, one will be picked randomly.</i>")
 }
 }
 
@@ -688,7 +828,7 @@ if (expandtxt == null) expandtxt = 'more info'
 args.reverse()
 var prevExp = args[0]
 for (var i = 1; i < args.length; ++i) {
-prevExp = args[i] + ' <a href="javascript:void(0)" style="background-color: #FFE96B" onclick="replaceMessageEscaped(' + extMsgId + ', \'' + escape(prevExp) + '\')">' + expandtxt + '</a>'
+prevExp = args[i] + ' <a href="javascript:void(0)" class="moreinfolink" onclick="replaceMessageEscaped(' + extMsgId + ', \'' + escape(prevExp) + '\')">' + expandtxt + '</a>'
 }
 return prevExp
 }
@@ -741,11 +881,13 @@ receiveSystemMessageAppending('Tip: you can chat from the translation box by pre
 }
 
 now.receiveChatMessage = function(text, userid) {
+var color = userColors[userid]
+var dispuser = '<span style="background-color: ' + color + '"><b>' + userid + '</b>: '
 var newSpan = ''
 if (text.length > 70) {
-newSpan = makeExtendableSpan(['<b>' + userid + '</b>:' + htmlEscape(text.slice(0,60)), '<b>' + userid + '</b>:' + htmlEscape(text)], 'more')
+newSpan = makeExtendableSpan([dispuser + htmlEscape(text.slice(0,60)) + '</span>', dispuser + htmlEscape(text) + '</span>'], 'more')
 } else {
-newSpan = '<b>' + userid + '</b>: ' + htmlEscape(text) + '<br/>'
+newSpan = dispuser + htmlEscape(text) + '</span><br/>'
 }
 $('#chatRegionContents').append(newSpan)
 scrollChatToBottom()
@@ -855,15 +997,20 @@ now.sendUserTranslations = function(translationToUserList, translationsByOrderSu
     if (numVotes > 5) {
       numVotes = 5;
     }
+    //curhtml += '<div style="float: left; position: relative">'
     var numNoVotes = 5 - numVotes;
     for (var j = 0; j < numNoVotes; ++j) {
       curhtml += '<img src="not-moderated.png" style="float: left" />';
+      //curhtml += '<div class="votebubble" ></div>';
     }
     for (var j = 0; j < numVotes; ++j) {
       var votingUserName = votingUsers[j];
+      var votingUserColor = userColors[votingUserName]
       curhtml += '<img src="accurate-moderated.png" style="float: left" title="' + votingUserName + '" alt="' + votingUserName + '" />';
+      //curhtml += '<span class="votebubble" style="background-color: ' + votingUserColor + '"  title="' + votingUserName + '" alt="' + votingUserName + '" ></div>';
     }
     
+    //curhtml += '</div>'
     curhtml += '<img src="check_22.png" style="float: left" title="Vote as accurate" alt="Vote as accurate" />';
     curhtml += '<img src="smiley_22.png" style="float: left" title="Vote as funny" alt="Vote as funny" />';
     
@@ -906,11 +1053,11 @@ function isRoundOver() {
 function setTextInSuggestionBox(txt) {
 $('#text_to_be_translated_suggestion').text(txt);
 if (txt == '') {
-$('#suggestTextLabel').html('<b>Use your mouse to highlight a sentence from the article that you want to translate.</b>')
-$('#suggestTextLabel').css('float', 'center')
+$('#suggestTextLabel').html('<b>Use your mouse to select a sentence from the article that you want to translate.</b>')
+$('#suggestTextLabel').css('text-align', 'center')
 } else {
 $('#suggestTextLabel').text('Sentence I suggested to be translated during the next round: ')
-$('#suggestTextLabel').css('float', 'left')
+$('#suggestTextLabel').css('text-align', 'left')
 $('#textSuggestionRegion').show()
 }
 }
@@ -1239,18 +1386,15 @@ Translation: <input type='text' name='add_translation' id='add_translation' styl
 
 <div style="float: left">Sentence being translated: &nbsp;</div><div name='text_being_translated' id='text_being_translated'></div>
 
-<form action="" onsubmit='return submitNewTranslation()'>
+<form action="" onsubmit='return submitNewTranslation()' class='submitstyle'>
 
 <table width="100%" cellspacing="0" cellpadding="0">
 <tr>
-<td style="white-space: nowrap">
-<div>Translation: &nbsp;</div>
-</td>
 <td width=100%>
-<input type='text' name='add_translation' id='add_translation' style="width: 100%; border: 0; margin: 0; padding: 0"></input>
+<input type='text' name='add_translation' id='add_translation' style="width: 100%;" class="text"></input>
 </td>
 <td style="white-space: nowrap">
-<input type="submit" value="Submit Translation"></input>
+<input type="submit" value="Submit Translation" class="transbutton"></input>
 </td>
 </tr>
 </table>
@@ -1259,7 +1403,7 @@ Translation: <input type='text' name='add_translation' id='add_translation' styl
 </div>
 
 <div id='textSuggestionRegion'>
-<div id='suggestTextLabel' style="float: center; text-align: center"><b>Use your mouse to highlight a sentence from the article below that you want to translate.</b></div><div style="float: left">&nbsp;</div><div id='text_to_be_translated_suggestion' style="float: left"></div><br/><br/></div>
+<div id='suggestTextLabel' style="float: center; text-align: center"><b>Use your mouse to select a sentence from the article below that you want to translate.</b></div><div style="float: left">&nbsp;</div><div id='text_to_be_translated_suggestion' style="float: left"></div><br/><br/></div>
 
 </div>
 
@@ -1278,9 +1422,20 @@ Translation: <input type='text' name='add_translation' id='add_translation' styl
 
 </div>
 
-<form action="" onsubmit='return sendChatMessage()'>
-<input type='text' name='chat_message' id='chat_message' style="width: 100%; border: 0; margin: 0; padding: 0"></input>
+
+<form action="" onsubmit='return sendChatMessage()' class='submitstyle'>
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr>
+<td width=100% height=100%>
+<input type='text' class='text' name='chat_message' id='chat_message' style="width: 100%;"></input>
+</td>
+<td style="white-space: nowrap" height=100%>
+<input type="submit" class='button' value="Send Chat"></input>
+</td>
+</tr>
+</table>
 </form>
+
 
 </div>
 

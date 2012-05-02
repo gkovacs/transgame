@@ -89,14 +89,17 @@ var translationToUserList = {}
 
 var userScores = {}
 var userList = []
+var userColors = {}
 
-gameIdToUserConnect[gameid] = function(userid) {
+gameIdToUserConnect[gameid] = function(userid, usercolor) {
   if (userScores[userid] == null)
     userScores[userid] = 0
   if ($.inArray(userid, userList) == -1) {
     userList.push(userid)
   }
+  userColors[userid] = usercolor
   nowjs.getGroup(gameid).now.sendUserTranslations(translationToUserList, translationsByOrderSubmitted)
+  nowjs.getGroup(gameid).now.sendNewUserColors(userColors, userList)
   nowjs.getGroup(gameid).now.sendNewScores(userScores, userList)
   //everyone.now.sendNewScores(userScores, userList)
   nowjs.getGroup(gameid).now.welcomeUser(userid)
@@ -281,8 +284,9 @@ nowjs.getGroup(gameid).now.sendChatMessage = function(text, userid) {
 
 nowjs.on("connect", function(){
   var userid = this.now.userid
+  var usercolor = this.now.usercolor
   var url = this.now.url
-  everyone.now.quitUser(userid, url)
+  //everyone.now.quitUser(userid, url)
   //useridToUser[userid] = this
   if (url != null) {
     if ($.inArray(url, gameList) == -1) {
@@ -296,7 +300,7 @@ nowjs.on("connect", function(){
     nowjs.getGroup(url).addUser(this.user.clientId)
     this.now.groupAddingFinished()
     //nowjs.getGroup(url).now.sendUserTranslations(translationToUserList, translationsByOrderSubmitted)
-    gameIdToUserConnect[url](userid)
+    gameIdToUserConnect[url](userid, usercolor)
     //everyone.now.sendGameList(gameToUsers, gameList)
   }
 });
